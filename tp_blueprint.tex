@@ -1,0 +1,1610 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype}
+\usepackage[margin=1.04in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage[hidelinks]{hyperref}
+\lstset{basicstyle=\ttfamily\footnotesize,columns=fullflexible,
+ keepspaces=true,showstringspaces=false,breaklines=true,
+ literate={ℕ}{{\(\mathbb N\)}}1 {ℝ}{{\(\mathbb R\)}}1
+ {ℂ}{{\(\mathbb C\)}}1 {→}{{\(\to\)}}2 {∀}{{\(\forall\)}}1
+ {∃}{{\(\exists\)}}1 {∧}{{\(\land\)}}1 {≤}{{\(\le\)}}1
+ {≠}{{\(\ne\)}}1 {∫}{{\(\int\)}}1 {∏}{{\(\prod\)}}1
+ {∑}{{\(\sum\)}}1 {ξ}{{\(\xi\)}}1 {𝓕}{{\(\mathcal F\)}}1
+ {‖}{{\(\Vert\)}}1 {⁻¹}{{\({}^{-1}\)}}1}
+\hypersetup{pdftitle={Full-dimensional twisted paraproducts: a formalization blueprint}}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newcommand{\R}{\mathbb R}
+\newcommand{\C}{\mathbb C}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\E}{\mathbb E}
+\newcommand{\ind}{\mathbf1}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\norm}[1]{\lVert#1\rVert}
+\newcommand{\avg}[2]{\langle #1\rangle_{#2}}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\Sch}{\mathcal S}
+\providecommand{\lean}[1]{}
+\providecommand{\uses}[1]{}
+\setlength{\emergencystretch}{1.6em}
+\title{Full-dimensional twisted paraproducts\\A formalization blueprint}
+\author{}
+\date{November 22, 2026}
+\begin{document}
+\maketitle
+
+\section{The untruncated estimate}
+Take \(d\ge2\), \(X=\R^d\) with Euclidean norm and Lebesgue measure,
+and \(f_i\in\Sch(X;\C)\) for \(i\in[d]=\{1,\ldots,d\}\). Write
+\(e_i\) for the \(i\)-th coordinate vector. For
+\(\xi=(\xi^1,\ldots,\xi^d)\in X^d\), set
+\(\eta(\xi)_i=\xi^i_i\). Use the Fourier character
+\(e^{-2\pi i x\cdot\xi}\) for the forward transform. A smooth Mihlin
+symbol on \(X\setminus\{0\}\) has finite seminorms
+\[
+ [m]_s=\max_{|\alpha|\le s}\sup_{\zeta\ne0}
+            |\zeta|^{|\alpha|}\,|\partial^\alpha m(\zeta)|.
+\]
+Give \(m\) value zero at the origin. Define the untruncated operator by
+\begin{equation}\label{bp:op}
+ T_m(\vec f)(x)=\int_{X^d}m(\eta(\xi))
+    \prod_{i=1}^d\widehat f_i(\xi^i)\,
+    e^{2\pi i x\cdot\sum_i\xi^i}\dd\xi .
+\end{equation}
+For a smooth angular function \(\Omega\) of spherical mean zero put
+\(K(y)=|y|^{-d}\Omega(y/|y|)\) for \(y\ne0\). The spatial version is
+\[
+ T_K(\vec f)(x)=\operatorname{p.v.}\int_X K(y)
+                              \prod_i f_i(x-y_i e_i)\dd y .
+\]
+Here the principal value is the joint limit over
+\(\epsilon<|y|<R\) as \(\epsilon\downarrow0,\ R\uparrow\infty\).
+
+\begin{theorem}[A priori estimate on Schwartz functions]\label{bp:main}
+\lean{TwistedParaproduct.proveBanachTarget}
+\uses{bp:frechet,bp:full-multiplier,bp:homogeneous-symbol,bp:hard-homogeneous}
+Suppose \(1<p_i<\infty\) and \(1/p=\sum_i1/p_i<1\).
+There are \(s\in\mathbb N\) and \(C<\infty\), depending only on
+\(d,\vec p\), such that for every \(m\) smooth away from the origin
+with \([m]_s<\infty\), and all Schwartz inputs,
+\[
+                \norm{T_m(\vec f)}_{L^p(X)}
+                \le C[m]_s\prod_{i=1}^d\norm{f_i}_{L^{p_i}(X)} .
+\]
+For every \(K\) above the untruncated principal value exists for these
+inputs and equals \eqref{bp:op} with the principal-value Fourier symbol
+of \(K\). In particular
+\[
+               \norm{T_K(\vec f)}_{L^p(X)}
+                    \le C_{d,\vec p,\Omega}\prod_i\norm{f_i}_{L^{p_i}(X)} .
+\]
+\end{theorem}
+
+The proof of Theorem~\ref{bp:main} is assembled after the identification
+of the principal value. Appendix~\ref{bp:lean-target} gives the
+typechecked Lean proposition for its Fourier estimate.
+Appendix~\ref{sec:tpb-source-map} records exact library declarations
+and the interfaces that require further formalization.
+In the \LaTeX{} source, \verb|\lean| gives the proposed declaration name
+and \verb|\uses| lists dependencies by label. The dyadic estimate is
+Proposition~\ref{bp:dyadic}; the Fourier estimate and the pointwise
+principal-value identification are Lemmas~\ref{bp:full-multiplier}
+and~\ref{bp:hard-homogeneous}.
+
+In Lean the
+inputs can be a family of \code{SchwartzMap} indexed by \code{Fin d}.
+Use \code{EuclideanSpace} for Fourier space and \code{eLpNorm} with
+exponents \(\operatorname{ofReal}(p_i)\) and
+\(\operatorname{ofReal}(p)\). Quantify a positive real constant and take
+its image in \(\mathbb R_{\ge0}^{\infty}\) in the norm inequality.
+All exponent reciprocals and all positive cutoffs in this text are
+ordinary real numbers. For coordinate integration, the standard
+orthonormal basis identifies \(X\) measure-preservingly with a finite
+product of real lines. In that representation \(x[i:=y]\) replaces
+coordinate \(i\). Evaluations of measurable functions below use
+measurable representatives. The integration identities in the proof
+descend to almost-everywhere equivalence classes.
+
+\begin{lemma}[Well-defined Fourier model]\label{bp:schwartz-Fourier}
+\lean{TwistedParaproduct.schwartzFourier}
+For Schwartz inputs \eqref{bp:op} is absolutely convergent and
+continuous in \(x\); its value is independent of the choice of \(m(0)\).
+\end{lemma}
+\begin{proof}
+The Fourier transform of each \(f_i\) is Schwartz, hence integrable.
+Fubini bounds the absolute integral by
+\([m]_0\prod_i\norm{\widehat f_i}_1\). The set \(\eta=0\) is contained
+in the coordinate hyperplane \(\xi^1_1=0\), which is null by Fubini.
+The same integrable majorant gives continuity by dominated convergence.
+\end{proof}
+
+\begin{lemma}[Two equivalent symbol seminorms]\label{bp:frechet}
+\lean{TwistedParaproduct.frechet}
+Replacing every order-\(k\) coordinate derivative in \([m]_s\) by the
+operator norm of the full \(k\)-linear Fr\'echet derivative gives an
+equivalent seminorm, with constants depending only on \(d,s\).
+\end{lemma}
+\begin{proof}
+Evaluate the Fr\'echet derivative on any ordered list of unit coordinate
+vectors to obtain the corresponding iterated partial derivative.
+Conversely, expand \(D^km(z)[v_1,\ldots,v_k]\) in the coordinate basis
+on each of its \(k\) inputs. There are \(d^k\) terms, each bounded by
+the largest coordinate derivative times \(\prod_j|v_j|\).
+Smoothness on the open punctured space permits interchange of coordinate
+derivatives. The \(k=0\) norm is \(|m(z)|\). Multiply by \(|z|^k\)
+and take suprema. In particular, quantifying over all nonnegative
+upper bounds \(B\) for the Fr\'echet version gives the same target.
+\end{proof}
+
+\section{Coordinate averages and finite martingales}
+
+All dyadic intervals are half open. At integer level \(k\) they have
+length \(2^{-k}\), and each interval is the disjoint union of its two
+children. A translated nested grid works identically. Write
+\(\langle f\rangle_I=|I|^{-1}\int_I f\) and
+\(h_I=\ind_{I_{\rm left}}-\ind_{I_{\rm right}}\). The operator
+\(E_k^i\) replaces a function by its average on the level-\(k\)
+interval in the \(i\)-th coordinate, with the other coordinates fixed.
+Write \(\Delta_k^i=E_{k+1}^i-E_k^i\).
+
+\begin{lemma}[Conditional averages and Haar squares]\label{bp:haar-square}
+\lean{TwistedParaproduct.haarSquare}
+For \(1\le p<\infty\), \(E_k^i\) is an \(L^p\) contraction,
+\(E_j^iE_k^i=E_{\min(j,k)}^i\), and on an interval \(I\) of
+level \(k\) one has
+\[
+       \Delta_k^i f(x)=h_I(x_i)\langle h_I f\rangle_I .
+\]
+Here and below a one-coordinate average retains all the other arguments
+of its integrand. For \(u<T\),
+\(\sum_{k=u}^{T-1}\norm{\Delta_k^i f}_2^2\le\norm{f}_2^2\).
+For any real \(C\in L^2(I)\) one also has
+\[
+ \tfrac12\sum_{J\ {\rm child\ of}\ I}\langle C\rangle_J^2
+                  -\langle C\rangle_I^2=\langle h_I C\rangle_I^2 .
+\]
+\end{lemma}
+\begin{proof}
+Jensen's inequality on each interval, summation and Fubini give the
+contraction. Nesting of intervals gives the composition rule. The two
+child averages are \(\langle f\rangle_I\pm\langle h_I f\rangle_I\);
+these two equalities give both Haar identities. Apply the square
+identity to the real and imaginary parts of \(f\) and add.
+Multiplying by \(|I|\), then summing and integrating
+the other coordinates gives
+\(\norm{\Delta_k^i f}_2^2=\norm{E_{k+1}^i f}_2^2-\norm{E_k^i f}_2^2\).
+Sum in \(k\) and apply contraction.
+\end{proof}
+
+\begin{lemma}[Directional dyadic maximal inequality]\label{bp:dyadic-max}
+\lean{TwistedParaproduct.dyadicMax}
+Let \(M_i f=\sup_{k\in\mathbb Z}E_k^i|f|\). For \(f\in L^1(\R^d)\)
+and \(\lambda>0\),
+\[
+          |\{M_i f>\lambda\}|\le \lambda^{-1}\norm{f}_1 .
+\]
+For almost every \(x\), \(E_k^i f(x)\to f(x)\) as \(k\to+\infty\).
+\end{lemma}
+\begin{proof}
+On almost every fixed fiber, \(f\) is integrable. The averages of
+\(|f|\) on intervals of lengths tending to infinity tend uniformly to
+zero there. Thus the exceptional intervals with average exceeding
+\(\lambda\) are contained in maximal exceptional intervals. These
+are disjoint, and each has length at most \(\lambda^{-1}\) times its
+integral of \(|f|\). Sum and integrate the fixed coordinates. All sets
+are measurable since there are countably many dyadic intervals.
+On the line the differentiation assertion holds for continuous functions
+by continuity. For any \(g\in C_c(\R)\) the upper limit of
+\(|E_k f-f|\) is bounded by \(M(f-g)+|f-g|\) almost everywhere.
+The weak bound and Markov's inequality make the measure of this
+upper limit exceeding \(\epsilon>0\) at most
+\(4\epsilon^{-1}\norm{f-g}_1\). Approximation in \(L^1(\R)\)
+and Fubini give the claim.
+\end{proof}
+
+\begin{lemma}[One-coordinate Calder\'on--Zygmund replacement]\label{bp:dyadic-cz}
+\lean{TwistedParaproduct.dyadicCz}
+Let \(0\le F\le\ind_A\), \(0<|A|<\infty\), and \(0<\lambda<1\).
+On each \(i\)-fiber, replace \(F\) on the maximal intervals of
+\(D=\{M_i\ind_A>\lambda\}\) by its average there, and keep its values
+elsewhere. The resulting \(g\) satisfies, up to null sets,
+\[
+ 0\le g\le 2\lambda,\qquad |\{g\ne0\}|\le |A|/\lambda,\qquad
+ E_k^i g=E_k^i F,\quad\Delta_k^i g=\Delta_k^i F
+                 \quad\text{on }D^c\quad(k\in\mathbb Z).
+\]
+\end{lemma}
+\begin{proof}
+\uses{bp:dyadic-max}
+The exceptional intervals form the disjoint collection from
+Lemma~\ref{bp:dyadic-max}. Their parents have density at most
+\(\lambda\), so their own densities are at most \(2\lambda\).
+Almost every point of \(A\) belongs to \(D\) by differentiation;
+the measure estimate follows from the same lemma. Any dyadic
+interval containing a point outside \(D\) either contains an entire
+exceptional interval or is disjoint from it. The integral of \(F-g\)
+on each exceptional interval vanishes. Absolute integrability
+justifies summing these zero integrals. This applies at both levels
+in the difference. Measurability follows by expressing maximality by
+countably many comparisons on each fiber.
+\end{proof}
+
+We next give the finite martingale estimates used below. One may work
+on a finite probability tree, since on a fixed initial dyadic interval
+the process has finitely many terminal atoms. A finite martingale
+\((M_k)_{k=0}^n\) on increasing partitions is constant on the atoms
+at time \(k\); conditional averaging at time \(k\) returns \(M_k\)
+from \(M_{k+1}\). All variables are real. Denote conditional
+expectation by \(\E_k\), write \(D_k=M_{k+1}-M_k\) for \(0\le k<n\),
+and put \(M^*=\max_{0\le k\le n}|M_k|\).
+
+\begin{lemma}[Bounded optional sampling]\label{bp:optional}
+\lean{TwistedParaproduct.optional}
+For stopping times \(0\le\sigma\le\tau\le n\), \(M_\sigma\) is
+measurable for the stopped partition and
+\(\E[M_\tau\mid\mathcal F_\sigma]=M_\sigma\). In particular
+\((M_{\tau_j})_j\) is a finite martingale for any finite
+nondecreasing sequence of stopping times \(\tau_j\).
+\end{lemma}
+\begin{proof}
+The stopped sigma algebra consists of events \(A\) such that
+\(A\cap\{\sigma\le k\}\in\mathcal F_k\) for every \(k\).
+Writing \(M_\sigma=\sum_k\ind_{\{\sigma=k\}}M_k\) proves the
+measurability assertion. For such \(A\),
+\[
+ \E[\ind_A(M_\tau-M_\sigma)]
+   =\sum_{k<n}\E[\ind_{A\cap\{\sigma\le k\}\cap\{\tau>k\}}D_k]=0 .
+\]
+The indicator in each term is measurable at time \(k\) and
+\(\E_kD_k=0\). Applying the equality to successive times proves the
+last assertion. This argument also proves
+\(\E[\ind_A M_n]=\E[\ind_A M_\sigma]\) with \(\tau=n\).
+\end{proof}
+
+\begin{lemma}[Finite maximal inequality]\label{bp:doob}
+\lean{TwistedParaproduct.doob}
+For \(1<p<\infty\), \(\norm{M^*}_p\le p(p-1)^{-1}\norm{M_n}_p\).
+\end{lemma}
+\begin{proof}
+\uses{bp:optional}
+Stop at the first \(k\) with \(|M_k|>\lambda\), recording \(n\) if
+there is no hit. The event \(A=\{M^*>\lambda\}\) is measurable at
+this time. Lemma~\ref{bp:optional} and conditional Jensen imply
+\(\lambda\mathbb P(A)\le\E[\ind_A|M_n|]\). Multiply by
+\(p\lambda^{p-2}\), integrate in \(\lambda\), and apply Fubini
+to get
+\(\E(M^*)^p\le p(p-1)^{-1}\E[|M_n|(M^*)^{p-1}]\).
+H\"older proves the assertion, including the zero-norm case.
+\end{proof}
+
+\begin{lemma}[Two finite square-function inequalities]\label{bp:mart-square}
+\lean{TwistedParaproduct.martSquare}
+Let \(S_k=(\sum_{j<k}|D_j|^2)^{1/2}\) and \(S=S_n\). For every
+\(2\le p<\infty\),
+\[
+       \norm{S}_p\le C_p\norm{M_n}_p,\qquad
+       \norm{M_n}_p\le C_p\norm{S}_p \quad\hbox{if }M_0=0 .
+\]
+\end{lemma}
+\begin{proof}
+\uses{bp:doob}
+For \(p=2\) conditional averaging gives
+\(\E S^2=\E M_n^2-\E M_0^2\). Take \(p>2\). For \(t,s\ge0\)
+the mean value theorem, separately on \(s\le t\) and \(s>t\), gives
+\((t+s)^{p/2}-t^{p/2}\le C_p(t^{p/2-1}s+s^{p/2})\).
+Hence
+\[
+ \E S^p\le C_p \E\sum_{k<n}
+       \big(S_k^{p-2}D_k^2+|D_k|^p\big).
+\]
+The expectation of the first sum equals
+\(\E\sum_k S_k^{p-2}(M_{k+1}^2-M_k^2)\), since
+\(\E_kD_k=0\). As \(S_k^{p-2}\) is increasing, discrete summation
+by parts bounds this last sum pointwise by \(S^{p-2}(M^*)^2\).
+The other sum is bounded by \((2M^*)^{p-2}S^2\). By H\"older,
+if \(s=\norm{S}_p\), \(m=\norm{M^*}_p\), then
+\(s^p\le C_p(s^{p-2}m^2+s^2m^{p-2})\). If \(s>m>0\), divide
+by \(s^p\) and use the positive exponents \(2,p-2\) to get
+\(s\lesssim_p m\). The other cases are immediate. Lemma~\ref{bp:doob}
+proves the first estimate.
+
+For the reverse estimate use the real-variable inequality
+\[
+ |a+b|^p-|a|^p-p|a|^{p-2}ab
+       \le C_p\bigl(|a|^{p-2}|b|^2+|b|^p\bigr).
+\]
+It follows by integrating the second derivative of \(|\cdot|^p\)
+between \(a\) and \(a+b\) and using
+\(|a+tb|^{p-2}\lesssim_p |a|^{p-2}+|b|^{p-2}\).
+Take \(a=M_k,b=D_k\), average, and telescope. The linear terms
+integrate to zero, and \(\sum_k|D_k|^p\le S^p\). When \(M_0=0\),
+\[
+ \norm{M_n}_p^p\le C_p\big(\norm{M^*}_p^{p-2}\norm{S}_p^2+
+                                     \norm{S}_p^p\big).
+\]
+Substitute Lemma~\ref{bp:doob} and divide by \(\norm{M_n}_p^p\)
+when it is nonzero. The second assertion follows.
+\end{proof}
+
+\begin{lemma}[Coordinate martingale transforms]\label{bp:mart-transform}
+\lean{TwistedParaproduct.martTransform}
+For \(2\le p<\infty\), \(u<v\), and \(|c_k|\le1\) real, the
+martingale \(Y_u=0\), \(Y_{k+1}=Y_k+c_k\Delta_k^b G\) satisfies
+\[
+                   \norm{Y_v}_p\le C_p\norm{G}_p .
+\]
+\end{lemma}
+\begin{proof}
+\uses{bp:mart-square,bp:haar-square}
+On each normalized initial interval in coordinate \(b\), the increments
+have conditional mean zero. For \(X_k=E_k^b G\) their square function
+satisfies \(S(Y)\le S(X)\) pointwise. Both bounds of
+Lemma~\ref{bp:mart-square} give
+\(\norm{Y_v}_p\lesssim_p\norm{X_v}_p\). Raise the estimate to
+the \(p\)-th power, multiply by the length of the initial interval,
+sum over those intervals and integrate the other coordinates.
+Apply Lemma~\ref{bp:haar-square} to \(X_v\). This argument also works
+for coefficients measurable at time \(k\). Complex scalar coefficients
+in a form can be treated by linearity in their real and imaginary parts.
+\end{proof}
+
+\subsection{Recording changes of amplitude}
+Assume \(0\le G_i\le\ind_{A_i}\), \(a_i=|A_i|<\infty\).
+Fix \(u<v\), let \(X^i_k=E_k^iG_i\) for
+\(u\le k\le T=v+d+1\), \(i\ne b\), and let \(Y\) be the transform
+of \(G_b\) on \(u\le k\le v\) from Lemma~\ref{bp:mart-transform}.
+For a finite path \(M=(M_k)_{u\le k\le t}\) write
+\(\operatorname{TV}(M)=\sum_{k=u}^{t-1}|M_{k+1}-M_k|\).
+All scalar paths below are functions on \(\R^d\).
+
+\begin{lemma}[Recording times, extinction, and variation]\label{bp:stopped-var}
+\lean{TwistedParaproduct.stoppedVar}
+Take \(M=X^i\) and \(a=a_i\), or \(M=Y\) and \(a=a_b\).
+For each \(0<\alpha\le1\) there is a path \(Z^\alpha(M)\), adapted
+to the coordinate filtration, with \(|M_k-Z^\alpha_k(M)|\le\alpha\) and
+\begin{align*}
+ \norm{\alpha\operatorname{TV}(Z^\alpha(M))}_q
+      &\lesssim_q a^{1/q}\qquad(1\le q<\infty),\\
+ \sum_k\int_{\R^d}|Z^\alpha_{k+1}(M)-Z^\alpha_k(M)|^2
+      &\lesssim a .
+\end{align*}
+For \(M=X^i\) its values lie in \([0,1]\), and \(Z^\alpha_k(M)=0\)
+whenever \(M_k=0\), up to null sets.
+\end{lemma}
+\begin{proof}
+\uses{bp:optional,bp:mart-square,bp:mart-transform}
+Start with \(Z_u=M_u\). At each later time record \(M_k\) if its
+distance from the previous recorded value is at least \(\alpha\).
+For \(X^i\), also record a new zero when the previous recorded value
+was nonzero. Otherwise retain the previous value. These comparisons
+use only values known by time \(k\), prove the tracking assertion,
+and preserve \([0,1]\) for \(X^i\). A nonnegative martingale reaching
+zero stays zero almost surely: on a zero atom, the average of its
+nonnegative terminal variable is zero. Thus the extra recording of a
+zero can happen at most once.
+
+Number the recording times in increasing order, include the initial
+time, and append copies of \(t\) so that the length is fixed and the
+list includes the terminal time. A terminal time added by convention
+does not change the recorded path. Each entry \(\tau_j\) is a
+stopping time, since the list of hits up to time \(k<t\) is
+measurable at \(k\). Set \(V=\sum_j |M_{\tau_{j+1}}-M_{\tau_j}|^2\).
+Lemmas~\ref{bp:optional} and \ref{bp:mart-square} at exponent \(2q\)
+give on each normalized initial interval
+\(\norm{V}_q\lesssim_q\norm{M_t}_{2q}^2\). Raise to power \(q\),
+sum with the interval lengths and integrate the fixed coordinates to
+obtain the same inequality globally. Contraction for \(X^i\), or
+Lemma~\ref{bp:mart-transform} for \(Y\), yields
+\(\norm{M_t}_{2q}^{2}\lesssim_q a^{1/q}\).
+Every jump of \(Z^\alpha\) is included in \(V\); \(q=1\)
+gives the integrated square bound.
+
+Every regular jump of size \(s\) satisfies \(\alpha s\le s^2\).
+For the extra zero hit with jump size \(s<\alpha\), its cost
+\(\alpha s\le\alpha^2\) is covered by an earlier regular jump
+square if one exists. If none exists then \(s=|M_u|\). Consequently
+\(\alpha\operatorname{TV}(Z^\alpha)\le2V+\alpha|M_u|\).
+For the low path \(\norm{M_u}_q\le a^{1/q}\); the high path starts
+at zero. This proves the variation bound.
+\end{proof}
+
+\begin{lemma}[Residual drift and Haar squares]\label{bp:residual-drift}
+\lean{TwistedParaproduct.residualDrift}
+For \(e_k=X^i_k-Z^\alpha_k(X^i)\), on each level-\(k\) interval
+\(I\) of coordinate \(i\) there are uniquely determined functions
+\(p_k,d_k\), constant on \(I\) with the other arguments fixed, with
+\[
+  e_{k+1}=e_k+p_k+h_I d_k,\qquad
+  |p_k|\le2\alpha,\qquad |d_k|\le\alpha .
+\]
+They satisfy \(\sum_k\norm{p_k}_1\lesssim a_i/\alpha\) and
+\(\sum_k\norm{d_k}_2^2\lesssim a_i\).
+For the true path \(X^i\) itself the same child expansion has \(p_k=0\),
+\(|d_k|\le1\), and \(\sum_k\norm{d_k}_2^2\le a_i\).
+\end{lemma}
+\begin{proof}
+\uses{bp:stopped-var,bp:haar-square}
+Take \(p_k=E_k^i e_{k+1}-e_k\) and let \(d_k\) be half the
+difference of the two child values; the two-child identities give
+uniqueness and both pointwise estimates. Martingality of \(X^i\)
+gives \(p_k=-E_k^i(Z^\alpha_{k+1}-Z^\alpha_k)\). Apply contraction
+and the \(q=1\) variation bound of Lemma~\ref{bp:stopped-var}.
+Also \(|d_k|^2\le E_k^i|e_{k+1}-e_k|^2\) by Jensen. The latter
+averages are bounded by twice the sum of the squared increments of
+\(X^i\) and \(Z^\alpha\), conditionally averaged. Integrate and sum
+using Lemmas~\ref{bp:haar-square} and \ref{bp:stopped-var}. The
+assertions for \(X^i\) follow directly from Lemma~\ref{bp:haar-square}.
+\end{proof}
+
+\begin{lemma}[All recorded low paths against the high transform]\label{bp:all-coarse}
+\lean{TwistedParaproduct.allCoarse}
+Suppose \(d\ge2\), \(0\le H\le\ind_{A_0}\), \(h=|A_0|>0\),
+\(a_i\ge h\), and \(R=\max_{i\in[d]}a_i/h\). For an integer \(N\ge0\)
+put \(\delta=2^{-N}\). For \(1<q<\infty\),
+\[
+ \left|\int_{\R^d}H(x)\sum_{k=u}^{v-1}
+       \left(\prod_{i\ne b} Z^\delta_k(X^i)(x)\right)
+                           (Y_{k+1}(x)-Y_k(x))\,dx\right|
+          \lesssim_{d,q}(N+1)^d h R^{1/q}.
+\]
+\end{lemma}
+\begin{proof}
+\uses{bp:stopped-var}
+For each path \(M\) write \(M^{[0]}=Z^1(M)\) and
+\(M^{[j]}=Z^{2^{-j}}(M)-Z^{2^{1-j}}(M)\) for \(1\le j\le N\).
+These paths add to \(Z^\delta(M)\). The tracking inequality gives
+\(\sup_k|M_k^{[j]}|\le3\,2^{-j}\) for \(j>0\). For low paths
+this estimate also holds for \(j=0\), since \(0\le X^i\le1\).
+For all \(j\), Lemma~\ref{bp:stopped-var} gives
+\(\norm{\operatorname{TV}(M^{[j]})}_q\lesssim_q 2^j a^{1/q}\).
+H\"older therefore gives
+\[
+        \int H\operatorname{TV}(M^{[j]})
+              \lesssim_q 2^j h^{1-1/q}a^{1/q}
+              \le C_q\,2^j hR^{1/q}.
+\]
+
+First take \(Z^\delta(Y)\) in the high position. Choose low levels
+\(n_i\) and high level \(m\), all in \(\{0,\ldots,N\}\), and put
+\(L_k=\prod_{i\ne b}(X^i)^{[n_i]}_k\). If \(m\le\max_{i\ne b}n_i\),
+the absolute pointwise sum is bounded by
+\(\sup|L|\,\operatorname{TV}(Y^{[m]})\). The integral costs at most
+\(C_{d,q}2^{m-\sum_{i\ne b}n_i}hR^{1/q}\le C_{d,q}hR^{1/q}\).
+This uses only variation for the possibly unbounded \(Y^{[0]}\).
+
+If \(m>\max_{i\ne b}n_i\), then \(m\ge1\). The identity obtained
+by expanding \(L_{k+1}W_{k+1}-L_kW_k\) and summing yields
+\[
+ \left|\sum_{k=u}^{v-1}L_k(W_{k+1}-W_k)\right|
+       \le \sup_k|W_k|\bigl(2\sup_k|L_k|+\operatorname{TV}(L)\bigr).
+\]
+Apply this with \(W=Y^{[m]}\). Replacing one product factor at a
+time gives
+\[
+ \operatorname{TV}(L)\le
+  \sum_{r\ne b}\operatorname{TV}((X^r)^{[n_r]})
+                \prod_{i\ne b,r}\sup_k|(X^i)_k^{[n_i]}|.
+\]
+The endpoint contribution is \(O_d(h)\) after integration. The
+\(r\)-th variation contribution costs at most
+\(C_{d,q}2^{-m+n_r-\sum_{i\ne b,r}n_i}hR^{1/q}
+\le C_{d,q}hR^{1/q}\). Summing all \((N+1)^d\) tuples gives
+the desired bound for \(Z^\delta(Y)\).
+
+Finally apply the same summation by parts with \(W=Y-Z^\delta(Y)\),
+so \(\sup|W|\le\delta\), and \(L_k=\prod_{i\ne b}Z^\delta_k(X^i)\).
+The low factors lie in \([0,1]\), whence
+\(\operatorname{TV}(L)\le\sum_{i\ne b}\operatorname{TV}(Z^\delta(X^i))\).
+H\"older and Lemma~\ref{bp:stopped-var} bound the integral by
+\(C_{d,q}hR^{1/q}\).
+\end{proof}
+
+\paragraph{Implementation.}
+Use one finite tree at a time for Lemmas~\ref{bp:optional}--\ref{bp:mart-square}.
+Conditional expectations on a tree are weighted sums on atoms.
+Represent a recording time by a natural number bounded by the terminal
+index. The recorded path can be defined by updating the last value at
+each index; the successive stopping times can be obtained by counting
+the updates. Extend their list by the terminal index, as in
+Lemma~\ref{bp:stopped-var}. For an interval offset use the low path at
+the actual generation of that interval. All \(L^p\) statements on
+\(\R^d\) follow by integration of finite-tree inequalities; this avoids
+putting a probability normalization on \(\R^d\) itself.
+
+\section{Pruning and reflected rectangles}
+Fix \(u<v\) in \(\Z\), \(b\in[d]\), and scalars \(|c_k|\le1\). For now
+use real coefficients and real, nonnegative functions
+\(0\le F_i\le\ind_{A_i}\) for \(0\le i\le d\), with finite positive
+measures \(a_i=|A_i|\). Write \(H=F_0,\ h=a_0\), and
+\[
+  \Lambda(\vec F)=\sum_{k=u}^{v-1}c_k
+       \int H\,\Delta_k^b F_b\prod_{i\in[d]\setminus\{b\}}E_k^iF_i .
+\]
+Fix \(t_0,\ldots,t_d>0\) of sum one and put \(W=\prod_{i=0}^d a_i^{t_i}\).
+Define \(C_*\) as the supremum of \(|\Lambda|/W\) over these data
+and coefficients with \(b,u,v,\vec t\) fixed. This supremum exists as
+a finite real number: coordinate averages are \(L^q\)-contractions by
+Jensen and Fubini, so H\"older with \(q_i=1/t_i\) gives
+\(C_*\le2(v-u)\). Terms involving null supports are zero by the same
+inequality.
+
+\begin{lemma}[Pruning and monotone masks]\label{bp:prune}
+\lean{TwistedParaproduct.prune}
+Assume \(h\le a_i\) for \(i\in[d]\). For \(K_*>1\) one can prune
+each \(F_i\) to \(G_i\) at total form cost
+\(dK_*^{-\min_{i\ge1}t_i}C_*W\). On each active dyadic cube \(Q\)
+there is a tester \(0\le H_Q\le H\) with the following properties.
+Its summed parent-to-child mass loss, including the final drop to
+zero, is at most \(h\). In coordinate \(i\), on a subinterval of the
+\(i\)-side of \(Q\) of relative length at least \(2^{-(d+1)}\),
+its fiber average is at most \(2^{d+1}K_*h/a_i\). In a pruned summand
+one can replace \(H\) by \(H_Q\). This remains true on replacing each
+low average by either itself or its zero-reset residual.
+\end{lemma}
+\begin{proof}
+\uses{bp:dyadic-max,bp:stopped-var,bp:haar-square}
+Put \(U_i=\{M_i\ind_{A_0}>K_*h/a_i\}\) for the directional dyadic
+maximal function and \(G_i=F_i\ind_{U_i^c}\).
+Lemma~\ref{bp:dyadic-max} gives \(|U_i|\le a_i/K_*\).
+Change one slot at a time. The changed difference has support
+\(A_i\cap U_i\), giving the asserted cost by the definition of \(C_*\).
+
+At a point of \(Q\), keep \(H(x)\) precisely if, for every ancestor
+\(Q'\supseteq Q\) including \(Q\), and every \(s\in[d]\),
+\[
+       \avg{\ind_{A_0}(x[s:=\,\cdot\,])}{I_s(Q')}\le K_*h/a_s .
+\]
+These countable tests are measurable and only accumulate on descending
+chains. Give every terminal cube the zero tester. Pointwise telescoping
+from \(u\) to \(v\), followed by integration, proves the loss bound.
+The test on \(Q\) in coordinate \(s\) is constant along that fiber.
+If it passes, the integral on a subinterval is at most the bound for
+the whole interval times the ratio of lengths after normalization.
+If it fails, the mask is zero there. If any ancestor test fails, all
+points of the original \(s\)-interval lie in \(U_s\) on this fiber.
+Consequently both child averages of \(G_s\) vanish when \(s=b\);
+when \(s\ne b\) the parent average vanishes. The reset convention
+also kills its residual there. This proves all the replacement
+identities.
+\end{proof}
+
+Fix \(\delta=2^{-N}\le1/2\) and a nonempty set
+\(D\subseteq[d]\setminus\{b\}\). On low slot \(i\) take
+\(L_i=e_i^\delta\) for \(i\in D\) and \(L_i=X_i=E^iG_i\) for the
+others. Write \(\sigma_i=\delta\) or \(1\), respectively, and use
+the actual interval value \(L_{i,I}(x_{\hat i})\).
+The two child values can be written \(L_{i,I}+P_{i,I}\pm D_{i,I}\),
+where \(P_{i,I}\) is the average increment and \(D_{i,I}\) the
+half-difference. The symbol \(D_{i,I}\) denotes a function here.
+By Lemmas~\ref{bp:haar-square} and~\ref{bp:residual-drift},
+\[
+ |L_{i,I}|,|D_{i,I}|\le\sigma_i,\quad |P_{i,I}|\le2\sigma_i,\quad
+ \sum_k\int |D_{i,k}|^2\lesssim a_i,\quad
+ \sum_k\int |P_{i,k}|\lesssim a_i/\delta\quad(i\in D).
+\]
+On a true martingale \(P_{i,I}=0\). Use path values from \(u\) through
+\(v+d+1\) in these estimates.
+
+\begin{definition}[Corner measure and marked energy]\label{bp:energy-def}
+\lean{TwistedParaproduct.energyDef}
+\uses{bp:prune,bp:residual-drift}
+For a rectangle \(V=\prod I_i\) use the normalized Lebesgue measure
+on each interval. For \(b\in J\subseteq[d]\) give coordinates
+\(j\in J\) two independent samples \(x_j^0,x_j^1\), and coordinates
+outside \(J\) one sample each. Use the product probability measure.
+For \(\omega:J\to\{0,1\}\) select the corner \(x^\omega\) by these bits.
+Write \(n=2^{|J|}\) and
+\[
+ B_J(V;Q)=\E\prod_\omega
+        \left[H_Q(x^\omega)\prod_{i\notin J}L_{i,I_i}(x^\omega_{\hat i})\right].
+\]
+Let \(S_i\) average over the two \(i\)-children of \(V\), evaluating
+the box with the same mask \(H_Q\); set \(\partial_i=S_i-1\).
+For offsets \(\nu_i\in\{0,\ldots,|J|-1\}\), write \(\mathcal V_{k,\nu}\)
+for all dyadic rectangles with lengths \(2^{-k-\nu_i}\). Each has a
+unique enclosing level-\(k\) cube \(Q_k(V)\). Define
+\[
+ U(J)=\max_{\nu,\,j\in J}
+ \sum_{k=u}^{v-1}\sum_{V\in\mathcal V_{k,\nu}}
+        |V|\,\partial_jB_J(V;Q_k(V)).
+\]
+Each grid is countable. In Lean one can use one sample per member of the
+disjoint sum of \(\operatorname{Fin}d\) and \(J\), adding a second
+sample only in \(J\). Corner selection is a measurable map out of this
+product.
+\end{definition}
+
+\begin{lemma}[Marginals and countable grid sums]\label{bp:marginal}
+\lean{TwistedParaproduct.marginal}
+Each corner has normalized Lebesgue measure on \(V\) as its marginal
+law. Each fixed-level grid sum in the energy is absolutely convergent.
+\end{lemma}
+\begin{proof}
+\uses{bp:energy-def}
+For every bounded measurable function of that corner, integrate out
+the unselected coordinates by Fubini. Their probabilities have mass
+one. The same identity holds for nonnegative measurable functions by
+monotone convergence. Bound every factor of a box by one except one
+central factor, which is at most \(\ind_{A_0}\). Multiply its integral
+by the rectangle volume and sum over the grid to obtain at most \(h\).
+The same bound holds for child averages since child volume is parent
+volume times the averaging weight. The triangle inequality for their
+difference proves the second assertion.
+\end{proof}
+
+\begin{lemma}[One reflected coordinate]\label{bp:box-square}
+\lean{TwistedParaproduct.boxSquare}
+The box and \(\partial_jB_J\) are nonnegative for \(j\in J\).
+The pruned form with tester \(H_Q\), high input \(G_b\), and low
+paths \(L_i\) has absolute value at most \(\sqrt{a_bU(\{b\})}\).
+\end{lemma}
+\begin{proof}
+\uses{bp:haar-square,bp:energy-def,bp:marginal}
+Hold all samples except the two \(j\)-samples fixed. The corner product
+splits into two copies of the same real function \(C(y)\), so its
+conditional integral is \(\avg C{I_j}^2\). Write
+\(h_I=\ind_{I_{\rm left}}-\ind_{I_{\rm right}}\). For child means
+\(a,b'\), the mean of the two squares minus the parent mean squared
+is \((a-b')^2/4=\avg{h_IC}{I}^2\). This proves positivity for signed
+low paths. On the unstaggered grid the local high difference is
+\(h_{I_b}(x_b)\avg{h_{I_b}G_b}{I_b}\) on each fiber.
+Integrate in \(x_b\) and apply Cauchy--Schwarz over the transverse
+points and marked cubes with weight \(|Q|\) using normalized fiber
+measures. The first square sums to at most \(a_b\) by
+Lemma~\ref{bp:haar-square}. The second sums to
+\(\sum_{k,Q}|Q|\partial_bB_{\{b\}}(Q;Q)\) by the identity just proved.
+\end{proof}
+
+\begin{lemma}[Telescoping moving masks]\label{bp:box-boundary}
+\lean{TwistedParaproduct.boxBoundary}
+At fixed \(J,\nu\) the grid sum with weights \(|V|\) of
+\((\prod_{i=1}^d S_i-1)B_J(V;Q_k(V))\) is at most
+\(nh\prod_{i\notin J}\sigma_i^n\). A marked derivative is bounded
+above by this quantity plus the absolute contributions from
+unreflected-coordinate refinements on grids with offsets at most
+\(|J|\).
+\end{lemma}
+\begin{proof}
+\uses{bp:prune,bp:box-square,bp:marginal}
+Refining once in every direction sends the grid at \(k\) exactly to
+the one at \(k+1\), with each child weight its volume. Each child
+rectangle lies in a unique level-\((k+1)\) cube whose parent is the
+old enclosing cube. Insert its new mask and telescope. All low factors
+are functions of their actual intervals and require no replacement.
+The initial boxes enter with minus sign and the last new boxes vanish.
+In a remaining difference, change the \(n\) masks one at a time. Keep
+only the changing mask difference, bound the other central factors by
+one and retain all low amplitude bounds. The integrated difference at
+one corner is the normalized integral of that mask drop on the
+rectangle. The child rectangles partition the new cubes.
+Lemma~\ref{bp:prune} bounds the total integrated drop by \(h\).
+This proves the first assertion.
+
+The operators \(S_i\) in distinct coordinates commute by finite
+averaging. Expand their product minus the identity in telescoping
+order, starting with the marked \(j\). Each other reflected term,
+preceded by positive averages, is nonnegative by
+Lemma~\ref{bp:box-square}. Move the unreflected terms to the other side.
+Their preceding averages refine selected coordinates once. This
+raises their offsets by at most one and preserves the original
+level-\(k\) mask.
+\end{proof}
+
+\begin{lemma}[Unreflected-coordinate expansion]\label{bp:box-expand}
+\lean{TwistedParaproduct.boxExpand}
+Fix \(i\notin J\) and one of the staggered grids produced in
+Lemma~\ref{bp:box-boundary}. Up to constants depending on \(d\), an
+individual term in the sum of \(\partial_i B_J\) with a drift or at
+least two half-differences costs at most
+\[
+    a_i\sigma_i^{n-2}\prod_{\ell\notin J,\ \ell\ne i}\sigma_\ell^n.
+\]
+A single half-difference and no drift costs at most
+\(\sigma_i^{n-1}\sqrt{a_i U(J\cup\{i\})}\).
+\end{lemma}
+\begin{proof}
+\uses{bp:energy-def,bp:marginal,bp:residual-drift,bp:box-square,bp:box-boundary}
+For each corner write \(A_\omega,P_\omega,D_\omega\) for its low
+value of type \(i\), drift and half-difference; these depend only on
+the transverse samples. Write \(C(y)\) for all remaining factors,
+with the common base \(i\)-coordinate set to \(y\). At a child of
+sign \(\tau\) expand \(\prod_\omega(A_\omega+P_\omega+\tau D_\omega)\).
+Averaging over the two children integrates \(C(y)\) against
+\(h_{I_i}(y)^m\), where \(m\) is the number of selected \(D\)'s.
+The all-\(A\) term cancels on subtracting the parent.
+
+In a term with a drift, retain one \(|P_\alpha|\) and bound the other
+\(n-1\) factors of type \(i\) by \(2\delta\). After discarding the
+central factors, the retained corner marginal is uniform on its
+rectangle. At fixed offset the \(i\)-levels \(k+\nu_i\) are distinct.
+Summing its integral therefore costs at most \(C a_i/\delta\).
+For a term with no drift and at least two \(D\)'s retain two and use
+\(2|D_\alpha D_\beta|\le D_\alpha^2+D_\beta^2\). The grid sum for
+either square is \(O(a_i)\) by the same marginal calculation.
+Every other low type still occurs \(n\) times. This proves the first
+bound.
+
+For a single \(D_\alpha\), apply Cauchy--Schwarz to the sum over
+rectangles and transverse samples. Put \(D_\alpha\prod_{\omega\ne\alpha}
+A_\omega\) in the first factor; it costs
+\(O(\sigma_i^{n-1}\sqrt{a_i})\). The second square integrates
+\(\avg{h_{I_i}C}{I_i}^2\). Identifying the two copies of its integration
+variable with the two independent \(i\)-samples makes it exactly a
+marked \(i\)-derivative in \(J\cup\{i\}\). All its offsets are at most
+\(|J|\), as allowed in that energy.
+\end{proof}
+
+\begin{lemma}[The two-copy density gain]\label{bp:two-copy}
+\lean{TwistedParaproduct.twoCopy}
+If \(J=\{b\}\) and \(i\in D\), each drift or multiple-difference term
+of Lemma~\ref{bp:box-expand} has the sharper bound
+\(C_{d,K_*}h^2/a_b\).
+\end{lemma}
+\begin{proof}
+\uses{bp:prune,bp:box-expand,bp:marginal,bp:residual-drift}
+Retain both central factors. After the drift or square estimate, the
+remaining coefficient at one anchor \(\alpha\) is bounded by a
+constant times \(\delta |P_\alpha|\) or \(D_\alpha^2\).
+It depends on the anchor's \(b\)-sample and the other transverse
+coordinates, and uses neither the opposite \(b\)-sample nor the base
+\(i\)-sample. First fix the base \(i\)-sample \(y\). Integrate the
+opposite central factor in its independent \(b\)-sample at cost
+\(2^{d+1}K_*h/a_b\). Integrate the anchor central factor in \(y\) at
+cost \(2^{d+1}K_*h/a_i\). These are precisely the uniform subinterval
+bounds in Lemma~\ref{bp:prune}; they apply with the inherited mask.
+The retained coefficient now sums to \(O(a_i)\) as in
+Lemma~\ref{bp:box-expand}. Multiplication yields the claim.
+\end{proof}
+
+\begin{lemma}[Residual estimate]\label{bp:residual}
+\lean{TwistedParaproduct.residual}
+Set \(M=\max_i a_i=hR\). For every nonempty choice \(D\) the residual
+form of Lemma~\ref{bp:box-square} is bounded in absolute value by
+\(C_{d,K_*}(h+M\delta^{2^{-d}})\).
+\end{lemma}
+\begin{proof}
+\uses{bp:box-boundary,bp:box-expand,bp:two-copy,bp:box-square,bp:energy-def}
+Induct on the number of unreflected coordinates. By
+Lemmas~\ref{bp:box-boundary} and~\ref{bp:box-expand}, \(U(J)\lesssim_d M\):
+the terminal boundary costs \(O_d(h)\), each multiple term costs
+\(O_d(a_i)\) and each singleton costs \(O_d(\sqrt{a_iM})\).
+The number of expansion terms is at most a constant depending on \(d\).
+
+For \(|J|\ge2\) and \(D\setminus J\ne\varnothing\), a second induction
+gives \(U(J)\lesssim_d M\delta^{2^{-(d-|J|)}}\).
+The boundary has a factor \(\delta^n\). Multiple terms have at least
+\(\delta^{n-2}\) since some residual occurs and \(n\ge4\).
+A singleton at a residual type has the gain \(\delta^{n-1}\) even with
+the crude child bound. A singleton at an ordinary type keeps a residual
+in the child and halves its exponent by the square root.
+The assertion at \(J=[d]\) has empty premise.
+At \(J=\{b\}\) the boundary and ordinary multiple terms have a factor
+\(\delta^2\). A residual multiple term costs \(O_{d,K_*}(h^2/a_b)\)
+by Lemma~\ref{bp:two-copy}. A residual singleton gains \(\delta\).
+An ordinary singleton inherits the square root of the strong child
+bound. If \(d=2\) such an ordinary singleton cannot occur. Thus
+\[
+ U(\{b\})\lesssim_{d,K_*} h^2/a_b+M\delta^{2^{-(d-1)}} .
+\]
+Lemma~\ref{bp:box-square}, \(a_b\le M\), and subadditivity of the square
+root give the asserted estimate.
+\end{proof}
+
+\section{Uniform strong estimates for the dyadic form}
+\begin{lemma}[Enlarging a supporting set]\label{bp:pad}
+\lean{TwistedParaproduct.pad}
+If \(A\subset X\) is measurable and \(|A|\le h<\infty\), then there
+is a measurable \(B\supseteq A\) with \(|B|=h\).
+\end{lemma}
+\begin{proof}
+The function \(r\mapsto|[-r,r]^d\setminus A|\) is continuous on
+\([0,\infty)\) by dominated convergence on bounded ranges of \(r\);
+cube boundaries have volume zero by Fubini. It starts at zero and
+tends to infinity since \(|A|<\infty\). By the intermediate value
+theorem choose \(r\) giving \(h-|A|\) and adjoin that cube to \(A\).
+\end{proof}
+
+\begin{lemma}[Uniform restricted form estimate]\label{bp:restricted}
+\lean{TwistedParaproduct.restricted}
+For the data defining \(C_*\), \(C_*\lesssim_{d,\vec t}1\) uniformly
+in \(b,u,v\). This restricted bound also holds for complex coefficients
+and complex inputs satisfying \(|F_i|\le\ind_{A_i}\).
+\end{lemma}
+\begin{proof}
+\uses{bp:prune,bp:all-coarse,bp:residual,bp:dyadic-max,bp:dyadic-cz,bp:pad,bp:haar-square,bp:stopped-var}
+First assume \(h\le\min_{i\ge1}a_i\). Apply Lemma~\ref{bp:prune} and
+use \(R=\max_{i\ge1}(a_i/h)\). Take
+\[
+ N=\max(1,\lceil 2^d\log_2 R\rceil),\qquad \delta=2^{-N}.
+\]
+For \(I=[d]\setminus\{b\}\), the finite product identity
+\[
+ \prod_{i\in I}X_i-\prod_{i\in I}Z_i^\delta
+   =\sum_{\emptyset\ne D\subseteq I}(-1)^{|D|+1}
+           \prod_{i\in D} e_i^\delta \prod_{i\in I\setminus D}X_i
+\]
+follows by expanding \(\prod(X_i-e_i^\delta)\). Keep the tester \(H\)
+in the all-recorded term of Lemma~\ref{bp:all-coarse}. Insert \(H_Q\)
+in every other term by Lemma~\ref{bp:prune}, and apply
+Lemma~\ref{bp:residual}. Their total cost is \(O_{d,K_*}(h)\) since
+\(R\delta^{2^{-d}}\le1\).
+Set \(t_*=\min_{i\ge1}t_i\). For \(q>2/t_*\), the coarse cost is bounded by
+\[
+ C_{d,q}(1+N)^d hR^{1/q}
+     \lesssim_{d,\vec t} hR^{t_*}
+     \le h\prod_{i=1}^d(a_i/h)^{t_i}=W .
+\]
+The middle inequality uses boundedness of
+\((1+x)^d e^{-(t_*-1/q)x}\) on \(x\ge0\); the last uses \(a_i/h\ge1\).
+Adding back the discarded data bounds \(|\Lambda|/W\) by
+\(C_{d,\vec t,K_*}+dK_*^{-t_*}C_*\) in this case.
+
+For arbitrary sizes choose \(L>d\). For each \(i\) with \(a_i<h/L\)
+remove \(V_i=\{M_i\ind_{A_i}>L a_i/h\}\) from the tester.
+The union has measure at most \(dh/L\) by Lemma~\ref{bp:dyadic-max}.
+The tester on this union costs at most \((d/L)^{t_0}C_*W\).
+Outside the union use Lemma~\ref{bp:dyadic-cz} on each such input.
+It preserves all factors at every \(x\) in the remaining tester,
+including the difference if \(i=b\). The replacement has amplitude at
+most \(2L a_i/h\) and support of measure at most \(h/L\).
+Divide it by \(2L a_i/h\) and enlarge its supporting set to size \(h\)
+by Lemma~\ref{bp:pad}. For \(h/L\le a_i<h\) just enlarge the supporting
+set to size \(h\). Keep \(A_0\) as a supporting set for the remaining
+tester. This permits the first case. Restoring the normalization costs,
+relative to \(W\), at most \(2L(a_i/h)^{1-t_i}\le2L\) per
+replaced slot and \((h/a_i)^{t_i}\le L\) per enlarged slot. Hence
+\[
+ C_* \le (2L)^d C_{d,\vec t,K_*}
+        +\big[(d/L)^{t_0}+(2L)^d d K_*^{-t_*}\big] C_* .
+\]
+Choose \(L\) and then \(K_*\) so the bracket is at most \(1/2\).
+The initial \(C_*<\infty\) allows subtraction. Finally expand each
+complex function into positive and negative real and imaginary parts
+and split the sequence of complex coefficients into real and imaginary
+parts. Every real part so obtained is covered by the restricted
+estimate after taking out its sign. This costs a constant depending
+only on the number of slots.
+\end{proof}
+
+\begin{lemma}[Restricted interpolation in the open H\"older simplex]
+\label{bp:interp}
+\lean{TwistedParaproduct.interp}
+Let an \(m\)-linear scalar form admit restricted estimates on
+\(|g_i|\le\ind_{B_i}\) with bound \(C_{\vec s}\prod_i |B_i|^{s_i}\)
+at a relative neighborhood of a positive tuple
+\(\vec t=(t_1,\ldots,t_m)\) of sum one. Then on simple functions of
+finite-measure support the form is bounded by
+\(C\prod_i\norm{g_i}_{1/t_i}\).
+\end{lemma}
+\begin{proof}
+Fix \(\rho>0\) small enough that each
+\(\vec t+\rho(e_i-e_j)\) lies in the neighborhood and use the largest
+of these finitely many constants and that at \(\vec t\).
+Split \(g_i\) into the disjoint amplitude layers \(g_{i,j}\) on
+\(B_{i,j}=\{2^j\le |g_i|<2^{j+1}\}\). Ignore null layers and set
+\(k_{i,j}=\lfloor\log_2 |B_{i,j}|\rfloor\). These lists are finite
+for simple functions. Define
+\[
+  b_i(k)=2^{t_i k}\sum_{\{j:\,k_{i,j}=k\}}2^j.
+\]
+In each nonempty group the sum of the distinct powers \(2^j\)
+is at most twice the largest. Therefore
+\(\sum_k b_i(k)^{1/t_i}\lesssim_{\vec t}
+\sum_j2^{j/t_i}|B_{i,j}|\le\norm{g_i}_{1/t_i}^{1/t_i}\).
+At a fixed tuple of support bins choose index \(r\) of maximal \(k_i\)
+and \(s\) of minimal \(k_i\). Apply the restricted estimate at
+\(\vec t+\rho(e_s-e_r)\) to the normalized layers.
+Since \(2^{k_i}\le |B_{i,j_i}|<2^{k_i+1}\), summing their amplitudes
+within each bin costs at most a universal factor times
+\[
+              2^{-\rho(\max k_i-\min k_i)}\prod_i b_i(k_i).
+\]
+For offsets \(l_i=k_i-k_1\) with \(l_1=0\), H\"older in \(k_1\) bounds
+the sum of products by \(\prod_i\norm{b_i}_{\ell^{1/t_i}}\).
+The number of offset vectors with \(\max_i|l_i|\le n\) is at most
+\((2n+1)^{m-1}\), and \(\max k_i-\min k_i\ge\max_i|l_i|\).
+The resulting polynomial times geometric series converges. This proves
+the lemma with no weak-space endpoint.
+\end{proof}
+
+\begin{proposition}[Strong dyadic bound]\label{bp:dyadic}
+\lean{TwistedParaproduct.dyadic}
+For \(1<p_i<\infty\), \(\sum_{i=0}^d1/p_i=1\),
+\[
+ \left|\sum_{k=u}^{v-1}c_k\int F_0\,\Delta_k^b F_b
+                     \prod_{i\in[d]\setminus\{b\}}E_k^i F_i\right|
+          \lesssim_{d,\vec p} \prod_{i=0}^d\norm{F_i}_{p_i}.
+\]
+This estimate holds for \(L^{p_i}\) inputs, all finite scale intervals,
+and \(|c_k|\le1\). It has the same constant after translating the
+grids independently and dilating them by a fixed positive factor in
+each coordinate.
+\end{proposition}
+\begin{proof}
+\uses{bp:restricted,bp:interp,bp:haar-square}
+Use Lemmas~\ref{bp:restricted} and~\ref{bp:interp}
+with \(m=d+1\). Approximate each input in \(L^{p_i}\) by simple
+functions with finite-measure support. For fixed endpoints the
+elementary \(2(v-u)\) bound controls the sum of the telescoping
+approximation errors. Passing to the limit retains the uniform
+constant. Conjugate by the diagonal affine map
+\(x_i\mapsto a_i+\lambda_i x_i\) for translated and dilated grids.
+The form picks up one Jacobian \(\prod_i\lambda_i\), and the norm
+product the same factor since \(\sum_i1/p_i=1\).
+\end{proof}
+
+\section{From coordinate martingales to Fourier multipliers}
+\label{bp:fourier-section}
+
+Use the convention \(\widehat g(\xi)=\int g(x)e^{-2\pi i x\cdot\xi}\dd x\).
+Fix \(d\ge2,\ 1<p_i<\infty\), and \(p>1\) with
+\(1/p=\sum_{i=1}^d1/p_i\). All input functions in the final multiplier
+statement are Schwartz functions on \(\R^d\). We use the elementary
+Fourier inversion and Plancherel theorems, Fubini--Tonelli,
+Lebesgue differentiation, and the usual integral inequalities for
+Lebesgue spaces. The estimates below give the other one-dimensional
+analysis needed in the reduction.
+
+\subsection{Finite sums of one-dimensional kernels}
+For a locally absolutely continuous \(a:\R\to\mathbb C\), define
+\[
+ Q(a)=\mathop{\rm ess\,sup}_{y\in\R}
+ (1+|y|)^4\bigl(|a(y)|+|a'(y)|\bigr),\qquad
+ a_k(y)=2^k a(2^k y)\quad(k\in\mathbb Z).
+\]
+Write \(a*_i f(x)=\int_\R a(y)f(x-ye_i)\dd y\) and
+\(A(y)=(1-|y|)_+\). In particular \(Q(A)<\infty\) and \(\int A=1\).
+
+\begin{lemma}[Maximal kernels on a coordinate]\label{bp:profile-max}
+\lean{TwistedParaproduct.profileMax}
+For \(1<q<\infty\),
+\[
+ \left\|\sup_{k\in\mathbb Z}|a_k*_i f|\right\|_q
+ \le C_q Q(a)\|f\|_q .
+\]
+\end{lemma}
+\begin{proof}
+On the line let \(M g(x)=\sup_{s>0}(2s)^{-1}
+\int_{x-s}^{x+s}|g|\). Integrating first on \(|y|\le 2^{-k}\)
+and then on \(2^{j-k}<|y|\le 2^{j+1-k}\), \(j\ge0\), bounds
+\(|a_k*g|\) by \(C Q(a)(1+\sum_{j\ge0}2^{-3j})Mg\).
+The maximal function obeys
+\(|\{Mg>\lambda\}|\le 3\|g\|_1/\lambda\).
+Indeed each point of this open set admits a centered interval with
+average greater than \(\lambda\). Cover a compact subset by finitely
+many such intervals and select intervals of largest remaining length,
+discarding those that intersect a selected one. The threefold dilates
+of the disjoint selected intervals cover the compact set. Inner
+regularity gives the claim. For \(g\in L^q\), the part of \(g\) of
+modulus at most \(\lambda/2\) has maximal function at most \(\lambda/2\).
+Apply the weak estimate to the rest and integrate the distribution
+bound against \(q\lambda^{q-1}\dd\lambda\). Tonelli and
+\(\int_0^{2|g|}\lambda^{q-2}\dd\lambda=(2|g|)^{q-1}/(q-1)\)
+give the strong bound. Applying this argument on lines and integrating
+in the spectator coordinates proves the assertion. Suprema may be
+taken over rational radii by continuity in the radius.
+\end{proof}
+
+\begin{lemma}[Scalar convolution bound from cancellation]
+\label{bp:scalar-cz}
+\lean{TwistedParaproduct.scalarCz}
+Suppose \(K\in L^1(\R)\), \(\|\widehat K\|_\infty\le B\), and
+\[
+ |K(x-u)-K(x)|\le B|u|\,|x|^{-2}\qquad(2|u|\le |x|,\ x\ne0).
+\]
+For \(1<q<\infty\), \(\|K*g\|_q\le C_q B\|g\|_q\),
+independently of \(\|K\|_1\).
+\end{lemma}
+\begin{proof}
+\uses{bp:dyadic-max}
+Normalize \(B=1\). The case \(B=0\) follows by Fourier uniqueness.
+Plancherel gives the \(L^2\) bound. For \(g\in L^1\) take the maximal
+dyadic intervals \(I\) of average \(\langle |g|\rangle_I>\lambda\).
+They are disjoint, their total length is at most \(\|g\|_1/\lambda\),
+and their averages are at most \(2\lambda\) by the parent bound.
+Large ancestor averages tend to zero since \(g\in L^1\). Off the union
+\(|g|\le\lambda\) almost everywhere by differentiation. Replacing \(g\)
+on these intervals by its complex average gives \(g_0\) with
+\(\|g_0\|_2^2\le 2\lambda\|g\|_1\) and
+\(g=g_0+\sum_I b_I\), where each \(b_I\) has integral zero, is
+supported on \(I\), and \(\sum_I\|b_I\|_1\le2\|g\|_1\).
+Outside the interval with the same center \(c_I\) and triple length,
+subtract \(K(x-c_I)\) inside \(K*b_I(x)\). For \(y\in I\),
+\[
+ \int_{|x-c_I|>3|I|/2}
+ \frac{|y-c_I|}{|x-c_I|^2}\dd x\le1 .
+\]
+Thus the \(L^1\) norm of \(K*b_I\) there is at most \(\|b_I\|_1\).
+The infinite sum agrees in \(L^1\) with convolution of the bad part
+since \(K\in L^1\). The union of the tripled intervals, Chebyshev on
+the good part in \(L^2\), and Chebyshev outside the union on the bad
+part give \(|\{|K*g|>\lambda\}|\le C\|g\|_1/\lambda\).
+For \(1<q<2\) split \(g\) at height \(\lambda\). Apply the weak
+\(L^1\) bound to \(g\ind_{\{|g|>\lambda\}}\) and the \(L^2\) bound
+to the rest, each at output height \(\lambda/2\). Multiply by
+\(q\lambda^{q-1}\) and integrate. The two inner integrals after
+Tonelli are \(\int_0^{|g|}\lambda^{q-2}\dd\lambda\) and
+\(\int_{|g|}^\infty\lambda^{q-3}\dd\lambda\), yielding the desired
+moment. For \(q>2\), the reflected conjugate kernel satisfies the
+same hypotheses, so duality gives the result.
+\end{proof}
+
+\begin{lemma}[Signed sums and square functions]\label{bp:profile-square}
+\lean{TwistedParaproduct.profileSquare}
+If \(\int a=0\) and \(Q(a)<\infty\), then for any finite
+\(I\subset\mathbb Z\), \(|z_k|\le1\), and \(1<q<\infty\),
+\[
+ \left\|\sum_{k\in I} z_k a_k*_i f\right\|_q+
+ \left\|\Big(\sum_{k\in I}|a_k*_i f|^2\Big)^{1/2}\right\|_q
+ \le C_q Q(a)\|f\|_q .
+\]
+\end{lemma}
+\begin{proof}
+\uses{bp:scalar-cz}
+Cancellation and \(|e^{it}-1|\le|t|\) give
+\(|\widehat a(\zeta)|\le C Q(a)|\zeta|\). Integration by parts,
+using \(a(\pm\infty)=0\) and \(a'\in L^1\), gives the bound
+\(C Q(a)/|\zeta|\). The sum of
+\(\min(2^{-k}|\zeta|,2^k/|\zeta|)\) over all integers is bounded by
+two geometric series. The kernel \(K=\sum_{k\in I}z_k a_k\) therefore
+satisfies \(\|\widehat K\|_\infty\le C Q(a)\). Its almost-everywhere
+derivative is bounded, away from zero, by
+\[
+ Q(a)\sum_{k\in\mathbb Z}2^{2k}(1+2^k|x|)^{-4}
+ \le C Q(a)|x|^{-2}.
+\]
+Split the sum at \(2^k |x|=1\) to obtain the last inequality.
+Absolute continuity on intervals gives the difference hypothesis of
+Lemma~\ref{bp:scalar-cz}, since every point between \(x-u\) and \(x\)
+has modulus at least \(|x|/2\) when \(2|u|\le |x|\). This proves the
+signed bound on the line and, by Fubini, on each coordinate.
+
+For independent uniform signs \(\varepsilon_k\) and complex scalars
+\(w_k\), put \(X=|\sum_k\varepsilon_k w_k|^2\) and \(S=\sum_k|w_k|^2\).
+Expansion gives \(\E X=S\) and \(\E X^2\le3 S^2\), since only
+indices paired in one of three ways can survive. For \(S>0\),
+\(S/2\le\E[X\ind_{\{X>S/2\}}]\le(\E X^2)^{1/2}
+\mathbb P(X>S/2)^{1/2}\). Thus \(S^{q/2}\le12\,2^{q/2}\E X^{q/2}\).
+Apply this pointwise and integrate the signed estimate.
+\end{proof}
+
+\begin{lemma}[An annular correction profile]\label{bp:tent-inverse}
+\lean{TwistedParaproduct.tentInverse}
+Fix \(0<c<C<\infty\). There is \(\lambda>0\) such that
+\(D(z)=\widehat A(\lambda z/2)-\widehat A(\lambda z)\) is nonzero
+on an open neighborhood of \(c\le |z|\le C\). For a Schwartz function
+\(\psi\) with Fourier support in that annulus, there is a Schwartz
+function \(v\) of integral zero with \(D\widehat v=\widehat\psi\) and
+\[
+ Q(v)\le C_{c,C}\sum_{j=0}^4\|(\widehat\psi)^{(j)}\|_\infty .
+\]
+\end{lemma}
+\begin{proof}
+Evenness and compact support yield \(\widehat A(z)=1-
+2\pi^2 z^2\int y^2A(y)\dd y+O(z^4)\). The quadratic coefficient is
+strictly negative, so \(\widehat A(w/2)-\widehat A(w)>0\) for
+sufficiently small nonzero \(w\). Choose \(\lambda\) accordingly, and
+choose a smooth cutoff equal to one on the annulus, supported in a
+bounded open set where \(D\ne0\), away from zero. Divide this cutoff
+by \(D\), extend it by zero, and multiply by \(\widehat\psi\) to
+obtain \(\widehat v\). This smooth compactly supported function
+vanishes at zero. Fourier inversion bounds \(v,v'\) by the \(L^1\)
+norms of \(\widehat v,2\pi iz\widehat v\); four integrations by parts
+give the same bounds for \(y^4v,y^4v'\) using the fourth derivatives.
+The claimed estimate follows by the product rule on a fixed compact set.
+\end{proof}
+
+\begin{lemma}[Averaging translated dyadic grids]\label{bp:random-grid}
+\lean{TwistedParaproduct.randomGrid}
+For \(u\le k\le v\), translate the grid of intervals of length
+\(\lambda_0 2^{-k}\) by a single variable uniform on
+\([0,\lambda_0 2^{-u})\), with \(\lambda_0>0\).
+The expected conditional expectation at level \(k\) is convolution
+with \(L^{-1}A(\cdot/L)\), \(L=\lambda_0 2^{-k}\).
+On independently translated coordinate grids, allowing a separate
+fixed dilation in each coordinate, the finite dyadic estimate
+\ref{bp:dyadic} has its ordinary constant.
+\end{lemma}
+\begin{proof}
+\uses{bp:dyadic}
+The translate modulo \(L\) is uniform since the largest length is an
+integer multiple of \(L\). The probability that \(x,y\) belong to the
+same grid interval is \((1-|x-y|/L)_+\), by measuring the possible
+location of the left boundary modulo \(L\). Multiply by \(1/L\) and
+integrate against the input. The expected difference of two successive
+levels is the difference of the two expected kernels. For the estimate
+on the changed grids, use the same affine change of variables in
+every input and in the tester. Its determinant cancels because the
+reciprocals of all form exponents sum to one. Translation and
+coordinate dilation conjugate the conditional expectations exactly.
+\end{proof}
+
+\begin{lemma}[Testing the output against Schwartz functions]\label{bp:dual}
+\lean{TwistedParaproduct.dual}
+For \(1<p<\infty\), \(p'=p/(p-1)\), and \(g\in L^p(X)\),
+\[
+ \norm g_p=\sup\{|\textstyle\int gh|:
+                       h\in\Sch(X;\C),\ \norm h_{p'}\le1\}.
+\]
+\end{lemma}
+\begin{proof}
+H\"older gives one inequality. If \(g\ne0\), the function that is
+\(\overline g\,|g|^{p-2}/\norm g_p^{p-1}\) on \(g\ne0\) and zero
+elsewhere has \(p'\)-norm one and gives equality. Approximate it in
+\(L^{p'}\) by Schwartz functions and divide each approximant by the
+maximum of one and its norm. H\"older passes the pairing to the limit.
+For \(g=0\) both sides vanish.
+\end{proof}
+
+\begin{lemma}[Separated finite sums]\label{bp:separated-cone}
+\lean{TwistedParaproduct.separatedCone}
+Let \(\widehat\psi\) have support in \(c\le |z|\le C\), and let
+\(\psi,\phi_i\) be Schwartz profiles on \(\R\). Write
+\[
+ P(\psi)=Q(\psi)+\sum_{j=0}^4\|(\widehat\psi)^{(j)}\|_\infty .
+\]
+Fix \(b\in\{1,\ldots,d\}\). For any finite interval \(I\) of integers
+and coefficients \(|c_k|\le1\),
+\[
+ \left\|\sum_{k\in I}c_k(\psi_k*_b f_b)
+            \prod_{i\ne b}(\phi_{i,k}*_i f_i)\right\|_p
+ \le C_{d,\vec p,c,C}\,P(\psi)\prod_{i\ne b}Q(\phi_i)
+                             \prod_{i=1}^d\|f_i\|_{p_i}.
+\]
+\end{lemma}
+\begin{proof}
+\uses{bp:random-grid,bp:tent-inverse,bp:profile-square,bp:dual,bp:profile-max,bp:dyadic}
+First take the low profiles all equal to \(A\). Use
+Lemma~\ref{bp:random-grid} with dilation \(1\) in those coordinates
+and \(\lambda\) from Lemma~\ref{bp:tent-inverse} in the distinguished one.
+In the finite dyadic estimate replace the coefficients by
+\(c_k\varepsilon_k\) and the distinguished input by
+\(\sum_{\ell\in I}\varepsilon_\ell v_\ell*_b f_b\). Its
+\(L^{p_b}\) norm is bounded uniformly by Lemma~\ref{bp:profile-square}.
+In the form paired against a Schwartz tester, expectation over the signs
+retains precisely \(\ell=k\). At each such \(k\), independence of the
+grid translations factors their expectation over coordinates. The high
+factor has multiplier \(D(2^{-k}\zeta)\widehat v(2^{-k}\zeta)
+=\widehat\psi(2^{-k}\zeta)\). The low factors have profiles \(A\).
+These exchanges are justified by finite sums and Fubini: each grid
+average contracts \(L^{p_i}\), each difference has norm at most two,
+and H\"older bounds the integral of the absolute value at each index.
+Each finite output belongs to \(L^p\) already by the individual
+one-coordinate \(L^1\)-kernel estimates and H\"older. Apply
+Lemma~\ref{bp:dual} to obtain the low-tent bound.
+
+For general low profiles write \(m_i=\int\phi_i\) and telescope
+from \(m_i A\) to \(\phi_i\) in a fixed order. The initial product
+costs \(\prod_{i\ne b}|m_i|\le C_d\prod_{i\ne b}Q(\phi_i)\).
+An error term has a mean-zero low profile
+\(a_i=\phi_i-m_i A\), with \(Q(a_i)\le C Q(\phi_i)\), and the
+mean-zero high profile \(\psi\). Bound the sum over \(k\) pointwise by
+the product of their two square functions and the scale suprema of
+the remaining factors. Lemmas~\ref{bp:profile-max} and
+\ref{bp:profile-square} and H\"older give the asserted bound.
+\end{proof}
+
+\subsection{Rescaled symbols and Fourier series}
+We now return to the symbol and Fourier convention in \eqref{bp:op}.
+
+\begin{lemma}[A finite family of conical cutoffs]\label{bp:cone-cutoffs}
+\lean{TwistedParaproduct.coneCutoffs}
+There are nonnegative \(\theta,\theta_1,\ldots,\theta_d
+\in C_c^\infty(\R^d)\) with
+\[
+ \theta=\sum_b\theta_b,\qquad
+ \sum_{k\in\mathbb Z}\theta(2^{-k}\eta)=1\quad(\eta\ne0),\qquad
+ \operatorname{supp}\theta_b\subseteq
+ \{1/2\le |z|\le2,\ |z_b|\ge 1/(4\sqrt d)\}.
+\]
+One may take \(\theta\) radial. For every \(b\) there are
+one-dimensional smooth cutoffs \(\gamma_{b,i}\) whose product equals
+one on \(\operatorname{supp}\theta_b\), with all supports in \((-3,3)\)
+and the support for \(i=b\) in \(\{1/(8\sqrt d)\le |s|\le3\}\).
+\end{lemma}
+\begin{proof}
+Take a radial smooth cutoff \(\chi\), nonincreasing in radius,
+equal to one on the unit ball and zero outside radius two. Set
+\(\theta(z)=\chi(z)-\chi(2z)\); the sum telescopes. Take smooth
+\(w\ge0\) vanishing on \([0,1/(4d)]\) and positive on \([1/d,1]\).
+Multiply \(\theta(z)\) by \(w(z_b^2/|z|^2)/\sum_iw(z_i^2/|z|^2)\)
+and extend by zero near the origin. At least one squared ratio is
+\(\ge1/d\), so the denominator is positive. The supports are as
+claimed. For the product cutoffs choose functions equal to one on
+\([-2,2]\) in low coordinates and on \(1/(4\sqrt d)\le |s|\le2\)
+in the distinguished coordinate, inside the indicated larger sets.
+\end{proof}
+
+\begin{lemma}[Uniform separated expansions]\label{bp:mode-expansion}
+\lean{TwistedParaproduct.modeExpansion}
+Set \(M_{k,b}(z)=\theta_b(z)m(2^kz)\), extended by zero near zero.
+For each integer \(s>d\) it admits the expansion on \(\R^d\)
+\[
+ M_{k,b}(z)=\sum_{n\in\mathbb Z^d} a_{k,b,n}
+  \prod_i\bigl(\gamma_{b,i}(z_i)e^{2\pi i n_i z_i/8}\bigr),
+ \qquad |a_{k,b,n}|\le C_{d,s}[m]_s(1+|n|)^{-s}.
+\]
+For fixed \(b\) let \(\widehat{\phi_{n,i}}(z)=
+\gamma_{b,i}(z)e^{2\pi i n_i z/8}\). Then
+\(Q(\phi_{n,i})\le C_d(1+|n_i|)^4\), and also
+\(P(\phi_{n,b})\le C_d(1+|n_b|)^4\).
+\end{lemma}
+\begin{proof}
+\uses{bp:cone-cutoffs}
+The chain rule bounds all derivatives of \(M_{k,b}\) through order
+\(s\) by \(C_{d,s}[m]_s\) on its fixed annulus. For a Fourier
+coefficient on the period cube \([-4,4]^d\) with normalized measure
+\(8^{-d}\dd z\), integrate \(s\) times by parts in a coordinate
+with \(|n_i|\ge |n|/\sqrt d\) if \(n\ne0\). Boundary terms vanish.
+For \(n=0\) use the integral bound. The resulting coefficient
+estimate gives absolute uniform convergence. Its sum equals the
+periodization, since the continuous difference has all Fourier
+coefficients zero. Indeed trigonometric polynomials are uniformly
+dense on the period torus by Stone--Weierstrass, so its squared
+modulus has zero integral. Multiplying by \(\prod_i\gamma_{b,i}\)
+restricts to the original cube and preserves \(M_{k,b}\) there.
+The inverse transform of each modulated cutoff is
+\(\check\gamma_{b,i}(\cdot+n_i/8)\). Since \(1+|y|\le
+(1+|y+n_i/8|)(1+|n_i|/8)\), translation costs the claimed fourth
+power in \(Q\). The product rule through four derivatives of the
+modulated frequency cutoff gives the additional terms in \(P\).
+\end{proof}
+
+\begin{lemma}[Full smooth multiplier estimate]\label{bp:full-multiplier}
+\lean{TwistedParaproduct.fullMultiplier}
+For \(s=5d+2\), every smooth symbol on \(\R^d\setminus\{0\}\)
+of finite \([m]_s\) satisfies on Schwartz inputs
+\[
+ \|T_m(\vec f)\|_p\le C_{d,\vec p}[m]_s\prod_i\|f_i\|_{p_i}.
+\]
+\end{lemma}
+\begin{proof}
+\uses{bp:mode-expansion,bp:separated-cone,bp:schwartz-Fourier,bp:cone-cutoffs}
+First use the symbol \(\sum_{k\in I}m(\eta)\theta(2^{-k}\eta)\)
+for a finite integer interval \(I\). For fixed \(b,n\), apply
+Lemma~\ref{bp:mode-expansion} at \(z=2^{-k}\eta\). Each factor
+depends only on the designated coordinate \(\xi_i^i\) in its own
+input. Fourier inversion therefore gives the physical factor
+\(\phi_{n,i,k}*_i f_i\) with \(\phi_{n,i,k}(y)=
+2^k\phi_{n,i}(2^k y)\). Fubini holds since the input transforms are
+integrable and the fixed frequency profiles are bounded. After
+rescaling \(a_{k,b,n}\) by their common upper bound, the sum over
+\(k\) is estimated by Lemma~\ref{bp:separated-cone}, at cost
+\[
+ C_{d,\vec p}[m]_s(1+|n|)^{4d-s}\prod_i\|f_i\|_{p_i}.
+\]
+Zero coefficients cost zero. This is summable over \(n\), and \(b\)
+has \(d\) possible values. For each finite \(I\) the mode expansion
+converges pointwise in the Fourier integral by its absolute
+coefficient bound. The triangle inequality for finite mode sums and
+Fatou bound the resulting operator uniformly in \(I\).
+Now take \(I=[-j,j]\cap\mathbb Z\). The symbols converge to \(m\)
+off zero and have modulus at most \(\|m\|_\infty\), since \(\theta\)
+is nonnegative. Dominated convergence gives pointwise convergence
+in the Fourier integral to the untruncated \(T_m\). Fatou proves
+the assertion.
+\end{proof}
+
+\subsection{Physical kernels and the principal value}
+
+\begin{lemma}[An integrable physical kernel]\label{bp:physical-integrable}
+\lean{TwistedParaproduct.physicalIntegrable}
+For \(L\in L^1(\R^d)\), put
+\[
+ U_L(\vec f)(x)=\int_{\R^d} L(y)\prod_{i=1}^d f_i(x-y_i e_i)\dd y .
+\]
+Then \(\|U_L(\vec f)\|_p\le\|L\|_1\prod_i\|f_i\|_{p_i}\).
+On Schwartz inputs \(U_L=T_{\widehat L}\) pointwise.
+\end{lemma}
+\begin{proof}
+Apply Minkowski in \(y\) and H\"older in \(x\) for each \(y\), using
+translation invariance of the input norms. On Schwartz inputs expand
+the factors by Fourier inversion. The absolute integral before
+exchanging integration is at most \(\|L\|_1\prod_i\|\widehat f_i\|_1\).
+The \(y\)-integral gives \(\widehat L(\xi_1^1,\ldots,\xi_d^d)\).
+\end{proof}
+
+\begin{lemma}[Off-origin kernel]\label{bp:mihlin-kernel}
+\lean{TwistedParaproduct.mihlinKernel}
+The tempered distribution \(\mathcal K=\mathcal F^{-1}m\) of a
+smooth Mihlin symbol is represented away from zero by a \(C^1\)
+function \(K\) satisfying
+\[
+ |K(y)|+|y|\,|\nabla K(y)|\le C_d[m]_{d+2}|y|^{-d}\quad(y\ne0).
+\]
+\end{lemma}
+\begin{proof}
+\uses{bp:cone-cutoffs}
+Use Lemma~\ref{bp:cone-cutoffs} and put \(L_k=\mathcal F^{-1}
+(m\,\theta(2^{-k}\cdot))\). For \(\ell=0,1\), Fourier inversion
+at rescaled frequency and \(d+2\) integrations by parts in a
+coordinate of largest \(|y_i|\) give
+\[
+ |\nabla^\ell L_k(y)|\le C_d[m]_{d+2}
+ 2^{k(d+\ell)}(1+2^k|y|)^{-d-2}.
+\]
+For \(2^k|y|\le1\) use the direct integral bound. Rescaled
+derivatives of the amplitude, including the linear frequency factor
+for \(\ell=1\), have bounded \(L^1\) norms through order \(d+2\)
+on a fixed annulus by the chain and product rules. Splitting the
+geometric sum at \(2^k|y|=1\) gives \(C_d[m]_{d+2}|y|^{-d-\ell}\).
+The series and its first derivatives converge locally uniformly off
+zero. Explicitly, \(\langle\mathcal K,g\rangle=\int m(\eta)
+\widehat g(-\eta)\dd\eta\) for Schwartz \(g\), with bilinear pairing.
+For smooth \(g\) compactly supported away from zero, integrals of
+the partial kernel sums against \(g\) converge to \(\int Kg\) by
+local uniform convergence. Fourier inversion of every frequency
+piece and dominated convergence against \(\widehat g(-\cdot)\)
+identify the same limit with \(\langle\mathcal K,g\rangle\).
+\end{proof}
+
+\begin{lemma}[Comparison with mollified kernels]\label{bp:hard-comparison}
+\lean{TwistedParaproduct.hardComparison}
+Fix \(\rho\in C_c^\infty(\R^d)\) of integral one and supported in the
+unit ball; put \(\rho_r(y)=r^{-d}\rho(y/r)\). For \(K,\mathcal K\)
+as in Lemma~\ref{bp:mihlin-kernel},
+\[
+ \left\|\ind_{\{|y|>r\}}K-\mathcal K*\rho_r\right\|_1
+          \le C_{d,\rho}[m]_{d+2}\qquad(r>0).
+\]
+\end{lemma}
+\begin{proof}
+\uses{bp:mihlin-kernel}
+Apply this explicit pairing to \(g(z)=\rho_r(y-z)\):
+\(\widehat g(-\eta)=e^{2\pi i y\cdot\eta}\widehat\rho(r\eta)\).
+The mollification is consequently the ordinary inverse transform of
+\(m(\eta)\widehat\rho(r\eta)\), and its modulus is at most
+\(r^{-d}\|m\|_\infty\|\widehat\rho\|_1\). This bounds the integral
+on \(|y|\le2r\) uniformly. For \(K\) on \(r<|y|\le2r\) integrate
+the size bound. On \(|y|>2r\) the distributional mollification is
+the ordinary local integral of \(K\), since its test function
+has support away from the origin. Subtract \(K(y)\int\rho_r\).
+The gradient bound along each segment gives
+\(C_{d,\rho}[m]_{d+2}r|y|^{-d-1}\), whose integral on this exterior
+region is uniformly bounded.
+\end{proof}
+
+\begin{lemma}[Uniform hard annuli]\label{bp:hard-general}
+\lean{TwistedParaproduct.hardGeneral}
+For a smooth Mihlin symbol \(m\) and its off-origin kernel \(K\),
+\[
+ \sup_{0<\epsilon<R<\infty}
+ \left\|U_{\ind_{\{\epsilon<|y|<R\}}K}(\vec f)\right\|_p
+ \le C_{d,\vec p}[m]_{5d+2}\prod_i\|f_i\|_{p_i}.
+\]
+\end{lemma}
+\begin{proof}
+\uses{bp:hard-comparison,bp:full-multiplier,bp:physical-integrable}
+Subtract the discrepancies of Lemma~\ref{bp:hard-comparison} at
+\(r=\epsilon,R\). Up to a uniformly controlled \(L^1\) error the
+hard annulus is \(\mathcal K*\rho_\epsilon-\mathcal K*\rho_R\).
+This difference is itself integrable and has Fourier transform
+\(m(\eta)(\widehat\rho(\epsilon\eta)-\widehat\rho(R\eta))\)
+almost everywhere by distributional Fourier inversion. Both sides
+are continuous away from zero, so equality holds there pointwise:
+every nonempty open ball has positive measure. For each
+\(\alpha\), the quantities \(|\eta|^{|\alpha|}
+|\partial^\alpha[\widehat\rho(r\eta)]|\) are uniformly bounded in
+\(r>0,\eta\ne0\) by the chain rule and rapid decay. The product rule
+bounds the degree-\(s\) seminorm of this symbol by
+\(C_{d,s,\rho}[m]_s\). Apply Lemma~\ref{bp:full-multiplier} and
+Lemma~\ref{bp:physical-integrable} to the difference and the
+integrable error. Fix one mollifier in every dimension.
+\end{proof}
+
+\begin{lemma}[Multiplier of a homogeneous principal value]
+\label{bp:homogeneous-symbol}
+\lean{TwistedParaproduct.homogeneousSymbol}
+Let \(\Omega\in C^\infty(S^{d-1})\) have surface integral zero, and
+put \(K(y)=|y|^{-d}\Omega(y/|y|)\) off zero. Its unmodified spherical
+principal-value distribution \(D_\Omega\), defined by
+\[
+ \langle D_\Omega,g\rangle=
+ \int K(y)\big(g(y)-g(0)\ind_{\{|y|\le1\}}\big)\dd y
+ \quad(g\ \text{Schwartz}),
+\]
+has a smooth Mihlin symbol \(m_\Omega=\widehat{D_\Omega}\) off zero
+and is the inverse transform of this bounded multiplier on all of
+\(\R^d\) in tempered distributions.
+\end{lemma}
+\begin{proof}
+\uses{bp:cone-cutoffs}
+The defining integral converges by the estimate \(g(y)-g(0)=O_g(|y|)\)
+near zero and rapid decrease at infinity. These estimates in terms
+of Schwartz seminorms give continuity on the Schwartz space.
+Cancellation on spheres identifies it with hard spherical principal
+values. Use the radial annulus \(\theta\) of Lemma~\ref{bp:cone-cutoffs}
+in the physical variable and put \(k(y)=K(y)\theta(y)\), smoothly
+extended by zero. It is smooth, compactly supported, and has integral
+zero by polar coordinates. Write \(k_r(y)=r^{-d}k(y/r)\), so
+\(k_r(y)=K(y)\theta(y/r)\). The sums \(\sum_{|\ell|\le j}k_{2^\ell}\)
+converge to \(D_\Omega\) on Schwartz tests: subtract
+\(g(0)\ind_{\{|y|\le1\}}\) in each annulus by radial cancellation
+and use \(0\le\sum_{|\ell|\le j}\theta(2^{-\ell}y)\le1\) for domination.
+
+Off zero the series \(m_\Omega(\eta)=\sum_{\ell\in\mathbb Z}
+\widehat k(2^\ell\eta)\) and all its derivative series converge
+locally uniformly. With \(r=2^\ell\) and \(h=|\alpha|\), for
+\(r|\eta|\le1\) the summand has modulus at most \(C r|\eta|\) if
+\(h=0\) (subtract one inside the transform), and its derivative of
+order \(h\ge1\) has modulus at most \(C_h r^h\) by differentiating
+the Fourier integral. For \(r|\eta|>1\), integration by parts \(h+2\)
+times in a coordinate of largest \(|\eta_i|\) bounds that derivative
+by \(C_h r^h(r|\eta|)^{-h-2}\). These constants use only finitely
+many derivatives of \(k\) for each \(h\). Summing the two geometric
+series gives \(C_h|\eta|^{-h}\), uniformly for finite partial sums
+as well. In particular the frequency sums for \(h=0\) are uniformly
+bounded globally. Dominated convergence against Schwartz tests now
+shows \(\widehat{D_\Omega}=m_\Omega\) as distributions on the whole
+space. This also fixes the additive constant in the multiplier
+through the specified spherical normalization.
+\end{proof}
+
+\begin{lemma}[The untruncated principal value on Schwartz inputs]
+\label{bp:hard-homogeneous}
+\lean{TwistedParaproduct.hardHomogeneous}
+For \(\Omega,K,m_\Omega\) as in Lemma~\ref{bp:homogeneous-symbol}
+and Schwartz inputs, the limit
+\[
+ \operatorname{p.v.}\int_{\R^d}
+  K(y)\prod_i f_i(x-y_i e_i)\dd y
+ =\lim_{\epsilon\downarrow0,\ R\uparrow\infty}
+     U_{\ind_{\{\epsilon<|y|<R\}}K}(\vec f)(x)
+ =T_{m_\Omega}(\vec f)(x)
+\]
+holds for every \(x\). The hard annuli converge also in \(L^p\);
+the principal value satisfies
+\(\|T_{m_\Omega}(\vec f)\|_p\le
+C_{d,\vec p,\Omega}\prod_i\|f_i\|_{p_i}\).
+\end{lemma}
+\begin{proof}
+\uses{bp:homogeneous-symbol,bp:physical-integrable,bp:full-multiplier,bp:hard-general,bp:schwartz-Fourier}
+Put \(G_x(y)=\prod_i f_i(x-y_i e_i)\). For every fixed \(x\),
+\(G_x\) is Schwartz in \(y\): each factor is a Schwartz function
+of its own \(y_i\) at the indicated fixed spectator coordinates.
+By spherical cancellation the truncated integral, for
+\(\epsilon<1<R\), is the same with
+\(G_x(y)-G_x(0)\ind_{\{|y|\le1\}}\) in place of \(G_x(y)\).
+Absolute convergence gives the pointwise limit
+\(\langle D_\Omega,G_x\rangle\) along all pairs of endpoints.
+For the finite physical sums \(L_j=\sum_{|\ell|\le j}k_{2^\ell}\)
+of Lemma~\ref{bp:homogeneous-symbol}, Fubini and Fourier inversion
+give \(U_{L_j}(\vec f)(x)=T_{\widehat L_j}(\vec f)(x)\) by
+Lemma~\ref{bp:physical-integrable}. The left side tends to
+\(\langle D_\Omega,G_x\rangle\) by the distributional limit.
+On the right the symbols are uniformly bounded and approach
+\(m_\Omega\) off zero. The product of the input Fourier transforms
+is integrable, so dominated convergence identifies the right limit
+with \(T_{m_\Omega}(\vec f)(x)\). The norm bound now follows from
+Lemma~\ref{bp:full-multiplier}; Lemma~\ref{bp:hard-general} also
+gives the uniform bound for the original hard annuli.
+
+For norm convergence, when \(|y|\le1\) the product rule and the
+mean value theorem give
+\(|G_x(y)-G_x(0)|\le C_L |y|(1+|x|)^{-L}\) for any \(L>0\).
+For large \(y\) put \(B=\max_i|x-y_i e_i|\). For each coordinate
+\(j\), choose \(i\ne j\) to see \(|x_j|\le B\); then
+\(|y_i|\le|x_i|+|(x-y_i e_i)_i|\le2B\).
+The largest argument therefore controls \(|x|+|y|\) up to a
+dimension constant. Bounding the corresponding Schwartz factor by
+rapid decrease and all others by their suprema gives
+\[
+ |G_x(y)|\le C_L(1+|x|)^{-L}(1+|y|)^{-1}
+ \qquad (|y|\ge1).
+\]
+By polar integration the discarded regions in the subtracted integral
+are bounded in modulus by \(C_{L,\Omega}(\epsilon+R^{-1})(1+|x|)^{-L}\).
+Taking \(Lp>d\) gives convergence in \(L^p\).
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{bp:main}]
+\uses{bp:full-multiplier,bp:frechet,bp:homogeneous-symbol,bp:hard-homogeneous}
+Use Lemma~\ref{bp:full-multiplier} with \(s=5d+2\) in
+\eqref{bp:op}. Lemma~\ref{bp:frechet} identifies its quantitative
+hypothesis with the bound in the Lean target. For a homogeneous
+mean-zero kernel, Lemma~\ref{bp:homogeneous-symbol} supplies a symbol
+with finite \([m_\Omega]_s\), and Lemma~\ref{bp:hard-homogeneous}
+identifies the untruncated principal value pointwise with
+\(T_{m_\Omega}\) on the same Schwartz inputs. Substitution gives the
+second inequality. All constants in the argument are independent of
+the scale endpoints.
+\end{proof}
+
+\clearpage
+\appendix
+\section{Lean statement of the Fourier estimate}\label{bp:lean-target}
+The following code elaborates using the library revisions in
+Appendix~\ref{sec:tpb-source-map}. It defines the proposition that the
+formalization must prove. The bound uses an explicit nonnegative upper
+bound \(B\) because real suprema in Lean are total even for unbounded
+sets. Lemma~\ref{bp:frechet} gives the conversion. The value of the
+symbol at zero can be arbitrary by Lemma~\ref{bp:schwartz-Fourier}.
+\begin{lstlisting}
+import Mathlib.Analysis.Distribution.SchwartzSpace.Fourier
+import Mathlib.MeasureTheory.Function.LpSeminorm.Defs
+
+open MeasureTheory
+open scoped BigOperators FourierTransform
+
+namespace TwistedParaproduct
+abbrev E (d : ℕ) := EuclideanSpace ℝ (Fin d)
+
+noncomputable def twisted {d : ℕ} (m : E d → ℂ)
+    (f : Fin d → SchwartzMap (E d) ℂ) (x : E d) : ℂ :=
+  ∫ ξ : Fin d → E d,
+    m (WithLp.toLp 2 (fun j => ξ j j)) *
+      (∏ j, (𝓕 (f j)) (ξ j)) *
+      Complex.exp (Complex.I * Complex.ofReal
+        (2 * Real.pi * inner ℝ x (∑ j, ξ j)))
+
+def BanachTarget : Prop :=
+  ∀ (d : ℕ), 2 ≤ d → ∀ (p : Fin d → ℝ) (r : ℝ),
+    (∀ j, 1 < p j) → 1 < r → r⁻¹ = ∑ j, (p j)⁻¹ →
+    ∃ (N : ℕ) (C : ℝ), 0 < C ∧ ∀ (m : E d → ℂ) (B : ℝ),
+      0 ≤ B → (∀ n : ℕ, ContDiffOn ℝ n m {x | x ≠ 0}) →
+      (∀ k ≤ N, ∀ z : E d, z ≠ 0 →
+        ‖z‖ ^ k * ‖iteratedFDeriv ℝ k m z‖ ≤ B) →
+      ∀ f : Fin d → SchwartzMap (E d) ℂ,
+        eLpNorm (twisted m f) (ENNReal.ofReal r) volume ≤
+          ENNReal.ofReal (C * B) *
+            ∏ j, eLpNorm (fun x => f j x) (ENNReal.ofReal (p j)) volume
+
+#check TwistedParaproduct.BanachTarget
+end TwistedParaproduct
+\end{lstlisting}
+For the spatial formulation, represent the untruncated value by
+\(\int K(y)(G_x(y)-G_x(0)\ind_{\{|y|\le1\}})\dd y\), where
+\(G_x(y)=\prod_i f_i(x-y_ie_i)\). Lemma~\ref{bp:hard-homogeneous}
+proves absolute integrability and equality with the principal value.
+The corresponding two-endpoint limit in Lean uses the product of the
+right-neighborhood filter at zero and \code{Filter.atTop} on the outer
+radius. The equation is a pointwise equality for each \(x\).
+
+
+\section{Lean source map}\label{sec:tpb-source-map}
+\begingroup\raggedright
+The references below use Lean \nolinkurl{v4.35.0-rc3}, \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/lakefile.toml#L1}{the lean-spherical package at} \texttt{800b71afca91e42809c21e6e2fd9ae4f82467082}, and \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/lake-manifest.json#L1}{its resolved mathlib dependency at} \texttt{c55e6e786f49471c72fbddbec5415808896aec1e}. The links select the precise source files and lines at these commits. The remaining interfaces described below are formalization work for the twisted operator.
+
+\paragraph{Coordinates, products, and density.}
+\nolinkurl{PiLp.volume_preserving_ofLp} and \nolinkurl{PiLp.volume_preserving_toLp} identify Lebesgue measure in Euclidean coordinates with finite product volume. Use these identifications, a permutation placing the active coordinate first, and product integration before applying a one-dimensional estimate on each fiber. \nolinkurl{MeasureTheory.integral_prod} applies to an integrable function; its nonnegative counterpart is \nolinkurl{MeasureTheory.lintegral_prod}. \nolinkurl{ENNReal.lintegral_prod_norm_pow_le} handles a finite family of weighted factors. \nolinkurl{SchwartzMap.denseRange_toLpCLM} supplies the Schwartz approximation in Lemma~\ref{bp:dual} at the tester exponent. Simple-function density is used separately in Proposition~\ref{bp:dyadic}. \href{https://github.com/leanprover-community/mathlib4/blob/c55e6e786f49471c72fbddbec5415808896aec1e/Mathlib/MeasureTheory/Measure/Haar/InnerProductSpace.lean#L134}{Coordinates}, \href{https://github.com/leanprover-community/mathlib4/blob/c55e6e786f49471c72fbddbec5415808896aec1e/Mathlib/MeasureTheory/Integral/Prod.lean#L440}{Fubini}, \href{https://github.com/leanprover-community/mathlib4/blob/c55e6e786f49471c72fbddbec5415808896aec1e/Mathlib/MeasureTheory/Measure/Prod.lean#L1009}{Tonelli}, \href{https://github.com/leanprover-community/mathlib4/blob/c55e6e786f49471c72fbddbec5415808896aec1e/Mathlib/MeasureTheory/Integral/MeanInequalities.lean#L241}{finite H\"older inequality}, \href{https://github.com/leanprover-community/mathlib4/blob/c55e6e786f49471c72fbddbec5415808896aec1e/Mathlib/Analysis/Distribution/SchwartzSpace/Basic.lean#L1377}{Schwartz density}.
+
+\paragraph{Martingales.}
+In namespace \nolinkurl{MeasureTheory}, \nolinkurl{martingale_condExp} gives the conditional-expectation process. \nolinkurl{Adapted.isStoppingTime_hittingBtwn_isStoppingTime} allows a bounded stopping time as the starting index for hitting a fixed measurable set. Package the displacement from the last held value as an adapted process and handle the terminal index and reset convention separately. \nolinkurl{Martingale.stoppedValue_ae_eq_condExp_of_le} gives the almost-everywhere conditional-expectation identity for ordered bounded stopping times with countable time index and the stated sigma-finiteness hypothesis on the trimmed measure. \nolinkurl{maximal_ineq} is a level-set inequality on a finite measure space for a nonnegative submartingale. For coordinate Lebesgue measure one can first work on coarsest finite intervals and then sum over them. The strong maximal moments, square-function moments, signed transforms and reset estimates used by the stopping argument need the scalar estimates developed in this blueprint. \href{https://github.com/leanprover-community/mathlib4/blob/c55e6e786f49471c72fbddbec5415808896aec1e/Mathlib/Probability/Martingale/Basic.lean#L141}{Conditional expectations}, \href{https://github.com/leanprover-community/mathlib4/blob/c55e6e786f49471c72fbddbec5415808896aec1e/Mathlib/Probability/Process/HittingTime.lean#L433}{hitting times}, \href{https://github.com/leanprover-community/mathlib4/blob/c55e6e786f49471c72fbddbec5415808896aec1e/Mathlib/Probability/Martingale/OptionalSampling.lean#L141}{optional sampling}, \href{https://github.com/leanprover-community/mathlib4/blob/c55e6e786f49471c72fbddbec5415808896aec1e/Mathlib/Probability/Martingale/OptionalStopping.lean#L144}{maximal inequality}.
+
+\paragraph{Maximal functions and finite signs.}
+In namespace \nolinkurl{Auto.HardyLittlewoodMaximal}, \nolinkurl{dyadic_ball_maximal_raw_weak_one} concerns the extended nonnegative supremum over \emph{centered balls of dyadic radii}. \nolinkurl{dyadic_hardy_littlewood_maximal_strong_type_schwartz} controls the actual pointwise maximal function on Schwartz input. \nolinkurl{dyadic_hardy_littlewood_maximal_Lp} is the bounded extension on \(L^p\) classes. For a dyadic grid interval containing the evaluation point, compare its average to the centered ball of radius the interval length. For convolution with a low profile, sum the centered-ball estimates on its decay annuli. \nolinkurl{Auto.LittlewoodPaley.rademacher_lower_moment} is a finite-powerset inequality for complex coefficients at every real moment order \(p\ge0\); divide by the number of subsets to obtain the uniform-sign expectation. It applies to the signed low-profile error as well as to smooth frequency bands. \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/LeanSpherical/Auto/HardyLittlewoodMaximal.lean#L330}{Weak estimate}, \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/LeanSpherical/Auto/HardyLittlewoodMaximal.lean#L1043}{Schwartz strong estimate}, \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/LeanSpherical/Auto/HardyLittlewoodMaximal.lean#L1326}{\(L^p\) extension}, \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/LeanSpherical/Auto/LittlewoodPaley.lean#L1357}{finite-sign lower moment}.
+
+\paragraph{Linear multipliers and singular kernels.}
+The scalar theorem \nolinkurl{Auto.MikhlinHormander.mikhlin} takes an indexed family satisfying a \emph{common} \nolinkurl{MikhlinCondition} of order \(N>d\), a finite real exponent \(p>1\), and complex Schwartz data. It returns a finite \nolinkurl{ENNReal} bound uniform in the index. The theorem is exported by \nolinkurl{LeanSpherical.Auto.CalderonZygmund}. For the band-quotient multiplier in one dimension, the indices can include both the signs and the finite interval of scales. Verify the derivatives of the compactly supported quotient and its finite annular overlap. The definition \nolinkurl{MikhlinCondition} includes differentiability off the origin, and \nolinkurl{coordinateMikhlinCondition_to_mikhlinCondition} converts coordinate estimates. In the same namespace, \nolinkurl{pow_norm_fourierInv_le_compactFourierIBPConstant} bounds inverse transforms of compact smooth pieces. \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/LeanSpherical/Auto/CalderonZygmund.lean#L5192}{Scalar multiplier theorem}, \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/LeanSpherical/Auto/MikhlinHormander.lean#L71}{symbol condition}, \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/LeanSpherical/Auto/MikhlinHormander.lean#L152}{coordinate conversion}, \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/LeanSpherical/Auto/MikhlinHormander.lean#L581}{Fourier decay}.
+
+For the tent comparison as written in the paper, the finite signed physical kernels are continuous. The applicable entry points in \nolinkurl{Auto.MikhlinHormander} are \nolinkurl{weak_one_finiteConvolutionKernel_of_L2_and_CZTail} and \nolinkurl{exists_uniform_strongLp_rawCore_of_weak_one_square_adjoint}. The first asks for boundedness of each kernel, a quantitative \(L^2\) estimate and its particular bad-atom tail condition. The second takes indexed forward and adjoint operators on Schwartz data, measurability, additivity, the indicated membership and endpoint bounds, and the adjoint pairing. Supply those interfaces for the finite signed kernels and their conjugate reflections. The powerset inequality then turns the signed estimate into a square estimate. The cutoff-specific \nolinkurl{littlewoodPaley_of_mikhlin} concerns the library's prescribed dyadic projections. \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/LeanSpherical/Auto/CalderonZygmund.lean#L144}{Kernel \(L^2\) condition}, \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/LeanSpherical/Auto/CalderonZygmund.lean#L504}{bad-atom tail condition}, \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/LeanSpherical/Auto/CalderonZygmund.lean#L4016}{weak endpoint}, \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/LeanSpherical/Auto/CalderonZygmund.lean#L4881}{parameter-uniform adjoint argument}, \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/LeanSpherical/Auto/CalderonZygmund.lean#L5228}{Littlewood--Paley corollary}.
+
+\paragraph{Fourier series and the remaining interfaces.}
+\nolinkurl{UnitAddTorus.mFourierCoeff_eq_integral} computes coefficients on a translated unit cube, and \nolinkurl{UnitAddTorus.hasSum_mFourier_series_apply_of_summable} recovers a continuous function pointwise once the coefficient family is summable. The lattice estimate \nolinkurl{Auto.Spherical.MSS.mss_integer_lattice_decay_periodization_uniform} takes \(d\) and \(N>d\), with a constant depending on both and uniform in the translate. Identify its lattice subtype with integer coordinate vectors. The remaining cone construction includes the smooth partition, rescaling to the torus, uniform coefficient decay and the translated-profile seminorm estimates. The shifted-grid tent identity and the finite-sign diagonal extraction also need explicit proofs for the chosen coordinate model. \href{https://github.com/leanprover-community/mathlib4/blob/c55e6e786f49471c72fbddbec5415808896aec1e/Mathlib/Analysis/Fourier/AddCircleMulti.lean#L251}{Coefficient integral}, \href{https://github.com/leanprover-community/mathlib4/blob/c55e6e786f49471c72fbddbec5415808896aec1e/Mathlib/Analysis/Fourier/AddCircleMulti.lean#L329}{pointwise reconstruction}, \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/LeanSpherical/Auto/Spherical/MSS/FourierCubeLattice.lean#L1311}{lattice summability}.
+
+The new mathematical development consists of the masked box recursion, its drift and Haar bounds, the small-support reduction, and the passage from neighboring restricted form estimates to the multilinear strong bound. The library's \nolinkurl{Auto.MarcinkiewiczInterpolation.hasStrongType_of_hasWeakType} has a single input function and full weak-type hypotheses. The paper's last passage also needs the uniform hard-annulus comparison for the inverse Fourier distribution and the norm convergence argument for homogeneous kernels. \href{https://github.com/roos-j/lean-spherical/blob/800b71afca91e42809c21e6e2fd9ae4f82467082/LeanSpherical/Auto/MarcinkiewiczInterpolation.lean#L3160}{Single-operator interpolation}.
+\par\paragraph{Polar integration and Fourier normalization.}
+For angular mean zero use unnormalized \nolinkurl{volume.toSphere}.
+The polar measure equivalence
+\nolinkurl{MeasureTheory.Measure.measurePreserving_homeomorphUnitSphereProd}
+splits the punctured space into the sphere and the positive radius
+with weight \(r^{d-1}\). Thus radial pieces of a homogeneous kernel
+with mean-zero angular factor have integral zero. In Lean one may
+express angular smoothness by smoothness of
+\(y\mapsto\Omega(y/|y|)\) on the punctured space: restricting to the
+sphere recovers the original function, and the radial projection is
+smooth there. With the Fourier convention in \eqref{bp:op}, inverse
+Fourier distribution pairings use \(\widehat g(-\eta)\) on a test \(g\).
+\href{https://github.com/leanprover-community/mathlib4/blob/c55e6e786f49471c72fbddbec5415808896aec1e/Mathlib/MeasureTheory/Constructions/HaarToSphere.lean}{Polar measure equivalence},
+\href{https://github.com/leanprover-community/mathlib4/blob/c55e6e786f49471c72fbddbec5415808896aec1e/Mathlib/Analysis/Distribution/SchwartzSpace/Fourier.lean}{Schwartz Fourier transform}.
+
+\endgroup
+
+\end{document}
