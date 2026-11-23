@@ -1,0 +1,6 @@
+{
+  "challenge_module": "Challenge",
+  "solution_module": "Solution",
+  "theorem_names": ["Auto.main_result_fourier", "Auto.main_result"],
+  "permitted_axioms": ["propext", "Classical.choice", "Quot.sound"]
+}

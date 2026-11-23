@@ -1,6 +1,6 @@
 name = "lean-twisted"
 version = "0.1.0"
-defaultTargets = ["TwistedParaproduct"]
+defaultTargets = ["TwistedParaproduct", "Challenge", "Solution"]
 
 [leanOptions]
 relaxedAutoImplicit = false
@@ -12,3 +12,9 @@ rev = "800b71afca91e42809c21e6e2fd9ae4f82467082"
 
 [[lean_lib]]
 name = "TwistedParaproduct"
+
+[[lean_lib]]
+name = "Challenge"
+
+[[lean_lib]]
+name = "Solution"
