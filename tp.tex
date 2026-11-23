@@ -1,0 +1,763 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype}
+\usepackage[margin=1.06in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={Boundedness of higher-dimensional twisted paraproducts}}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\E}{\mathbb E}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\avg}[2]{\langle #1\rangle_{#2}}
+\newcommand{\anorm}[1]{\lVert #1\rVert}
+\newcommand{\A}{\mathcal A}
+\newcommand{\G}{\mathcal G}
+\newcommand{\B}{\mathcal B}
+\newcommand{\D}{\mathcal D}
+\DeclareMathOperator{\supp}{supp}
+\title{Boundedness of higher-dimensional twisted paraproducts}
+\author{}
+\date{November 23, 2026}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We prove strong estimates for the higher-dimensional twisted paraproduct
+throughout the finite-input Banach range.
+For example, for arbitrary smooth angular kernels of mean zero the
+operator maps \((L^{2d}(\mathbb R^d))^d\) into \(L^2(\mathbb R^d)\),
+uniformly in both hard radial truncation scales. The proof combines
+stopping times for one-coordinate martingales with a recursion on
+reflected coordinates. A residual after stopping has small amplitude.
+At the step where two copies of this residual occur, fiberwise density
+bounds for the tester control their joint contribution.
+\end{abstract}
+
+\section{The higher-dimensional twisted paraproduct}
+Let \(d\ge2\) and write \([d]=\{1,\ldots,d\}\). For a multiplier
+\(m\) on \(\R^d\setminus\{0\}\) and Schwartz functions
+\(f_i:\R^d\to\mathbb C\) define
+\begin{equation}\label{eq:mult}
+ T_m(\vec f)(x)=\int_{(\R^d)^d}
+    m(\eta)\prod_{i=1}^d\widehat f_i(\xi^i)
+       e^{2\pi i x\cdot(\xi^1+\cdots+\xi^d)}
+                  \dd\xi^1\cdots\dd\xi^d,\qquad \eta_i=\xi_i^i .
+\end{equation}
+Thus \(m\) sees just one frequency coordinate from each input. We use the Mihlin seminorm
+\[
+  [m]_s=\max_{|\alpha|\le s}\sup_{\eta\ne0}
+                        |\eta|^{|\alpha|}|\partial^\alpha m(\eta)|.
+\]
+Let \(e_1,\ldots,e_d\) denote the standard coordinate vectors.
+\begin{theorem}\label{thm:main}
+Let \(1<p_i<\infty\), \(1/p=\sum_{i=1}^d1/p_i<1\). There exists
+a finite integer \(s=s(d,\vec p)\) such that
+\begin{equation}\label{eq:bound}
+       \|T_m(\vec f)\|_{p}\le C_{d,\vec p}[m]_s
+                        \prod_{i=1}^d\|f_i\|_{p_i}
+\end{equation}
+for every smooth Mihlin symbol \(m\) and all Schwartz inputs
+\(f_1,\ldots,f_d\), with \(T_m\) the untruncated operator in \eqref{eq:mult}.
+If \(K(y)=|y|^{-d}\Omega(y/|y|)\) with \(\Omega\in C^\infty(S^{d-1})\)
+and \(\int_{S^{d-1}}\Omega=0\), the hard radial truncations
+\begin{equation}\label{eq:hard}
+  T^K_{\epsilon,R}(\vec f)(x)=\int_{\epsilon<|y|<R}
+       K(y)\prod_{i=1}^d f_i(x-y_i e_i)\dd y
+\end{equation}
+satisfy
+\[
+    \sup_{0<\epsilon<R<\infty}\|T^K_{\epsilon,R}(\vec f)\|_p
+            \le C_{d,\vec p,\Omega}\prod_{i=1}^d\|f_i\|_{p_i}.
+\]
+The truncations converge in \(L^p\) as \(\epsilon\downarrow0\), \(R\uparrow\infty\).
+The uniform estimate for hard truncations also holds for the
+off-origin kernel of any smooth Mihlin multiplier, with the constant
+controlled by finitely many Mihlin seminorms.
+\end{theorem}
+\paragraph{Previous estimates.}
+The planar operator was Case~6 in Demeter and Thiele's classification
+of two-dimensional bilinear Hilbert transforms \cite[Introduction]{DemeterThiele}.
+Bernicot showed how to lower the input exponents once one estimate is
+known \cite[Theorem~2]{Bernicot}. Kova\v{c} proved the first bounds,
+covering \(1/2<p<2\) for finite \(p_1,p_2>1\)
+\cite[Theorem~1 and (1.9)]{Kovac}. Lin and Slav\'ikov\'a later allowed
+mean-zero \(L^q\) angular kernels, \(q>1\), for \(1\le p<2\), and
+identified the smooth-kernel estimate at \(p\ge2\) as open
+\cite[Theorem~1.1 and (1.4)]{LS}. Durcik and Roos formulated
+\eqref{eq:mult} in all dimensions in connection with averages of simplex
+Hilbert transforms. They obtained \(1<p<4/3\), \(1<p_i<4\) in dimension
+three and recorded that no tuple was then known for \(d\ge4\)
+\cite[(1.10) and Section~3]{DR}. Anisotropic analogues were proved in
+dimensions two and three \cite[Theorem~2]{CDR}, \cite[Theorem~4]{DFR}.
+
+\paragraph{Where the planar proof changes.}
+In Kova\v{c}'s dyadic form \(\sum_k\int H(E_k^1 F)(\Delta_k^2G)\),
+squaring a vertical Haar coefficient introduces two independent vertical
+samples. The square is a child-minus-parent difference, so the resulting
+box averages telescope. His tree estimate measures the tester \(H\) by
+its box norm on each leaf \cite[Proposition~4]{Kovac}. On the unit
+square take \(H=\ind_{[0,\rho]\times[0,1]}\). Its box norm is
+\(\rho^{1/2}\), since two independent horizontal samples must enter
+the strip. The estimate \(L^6\times L^6\to L^3\) in
+Theorem~\ref{thm:main} calls for the smaller \(\|H\|_{3/2}=\rho^{2/3}\).
+
+We keep the Haar-square identity. Before using it, we split each low
+coordinate average into a value recorded at successive oscillations
+of size \(\delta\) and an error bounded by \(\delta\).
+For the term with all low values recorded, summation by parts pairs the
+variation of one path with the amplitude of another. Its cost grows
+only polynomially in \(1+\log(1/\delta)\), uniformly in the number of
+spatial scales (Lemma~\ref{lem:all-coarse}).
+
+Every other term contains an error. Each new reflection doubles the
+copies of every remaining error. A drift term or a pair of Haar
+differences can use up two small factors, so
+four copies leave a gain. At the first square there are only two.
+Here let \(b\) be the coordinate carrying the original difference,
+\(a_i\) the input support measures and \(h\le\min_i a_i\) the tester
+support measure. After pruning, the tester has density \(O(h/a_i)\)
+on each active \(i\)-fiber \eqref{eq:fiber}. For an error in coordinate
+\(i\), one tester copy can be averaged in a fresh \(b\)-variable and
+the other in the \(i\)-variable on which the retained coefficient is
+constant. Their densities turn its mass \(O(a_i)\) into
+\(O(a_i(h/a_b)(h/a_i))=O(h^2/a_b)\). The initial Cauchy--Schwarz
+inequality \eqref{eq:first} takes the square root and multiplies by
+\(\sqrt{a_b}\), giving \(O(h)\). Set \(R=\max_i a_i/h\). The later
+square roots leave an error \(O(hR\delta^{2^{-d}})\) in \eqref{eq:resbound}.
+Taking \(\delta\asymp R^{-2^d}\) makes this \(O(h)\). The recorded term
+then costs \(O_{\varepsilon}(hR^\varepsilon)\) for every \(\varepsilon>0\)
+by Lemma~\ref{lem:all-coarse}, enough for the required
+\(h\prod_i(a_i/h)^{1/p_i}\).
+Fiberwise decomposition and interpolation give the strong estimates,
+and Section~\ref{sec:continuum} passes from dyadic averages to multipliers.
+
+
+\section{A dyadic estimate and tester densities}\label{sec:prune}
+Let \(E_k^i\) be dyadic conditional expectation at interval length
+\(2^{-k}\) in coordinate \(i\) alone. Write
+\(\Delta_k^i=E^i_{k+1}-E^i_k\). For \(u<v\), \(b\in[d]\), and
+\(|c_k|\le1\), consider
+\begin{equation}\label{eq:dyadic}
+ \Lambda_b(\vec F)=\sum_{k=u}^{v-1}c_k
+     \int F_0\,\Delta_k^b F_b\prod_{i\ne b,\ i\ge1}E_k^i F_i .
+\end{equation}
+\begin{proposition}\label{prop:dyadic}
+If \(0<t_i<1\) for \(0\le i\le d\) and \(\sum_{i=0}^dt_i=1\), then
+\[
+       |\Lambda_b(\vec F)|\lesssim_{d,\vec t}
+                   \prod_{i=0}^d\|F_i\|_{1/t_i}.
+\]
+The bound is uniform in the coefficients and truncations.
+\end{proposition}
+We first prove the restricted estimate for \(0\le F_i\le\ind_{A_i}\),
+with \(a_i=|A_i|<\infty\). Multilinearity then gives the restricted
+estimate for complex functions. Null supports are immediate. Write
+\(H=F_0,\ h=a_0,\ W=\prod_{i=0}^d a_i^{t_i}\). For fixed endpoints
+and \(b\) let \(C\) be the best restricted constant on nonnegative
+inputs, uniformly in \((c_k)\). H\"older and contraction give
+\(C\le2(v-u)\).
+
+First suppose
+\begin{equation}\label{eq:smalltest}
+             h\le \min_{1\le i\le d}a_i ,
+\end{equation}
+and put \(R=\max_{1\le i\le d}a_i/h\).
+Let \(M_i\) be the dyadic maximal operator in coordinate \(i\).
+Fix \(K>1\), and set
+\[
+   U_i=\{M_i\ind_{A_0}>K h/a_i\},\qquad G_i=F_i\ind_{U_i^c}.
+\]
+The fiberwise weak \((1,1)\) estimate gives \(|U_i|\le a_i/K\).
+Replacing \(F_i\) by \(G_i\) in telescoping order costs at most
+\(d K^{-\min_{i\ge1}t_i}CW\). For a level-\(k\) active cube \(Q\)
+define \(H_Q(x)\) as \(H(x)\) times the indicator that for every
+\(s\in[d]\) and every dyadic ancestor \(Q'\supseteq Q\)
+(including \(Q\)) one has
+\[
+       \frac1{|I_s(Q')|}\int_{I_s(Q')}\ind_{A_0}(y_s,x_{\hat s})
+                                    \dd y_s\le K h/a_s .
+\]
+Here \(I_s(Q')\) is the \(s\)-interval of \(Q'\) and \(x_{\hat s}\)
+denotes the remaining coordinates. On the level-\(v\) cubes set the
+new mask to zero. These masks decrease down chains and satisfy
+\begin{equation}\label{eq:drop}
+   \sum_{k=u}^{v-1}\sum_{Q'\text{ at }k+1}
+       \int_{Q'}(H_{\operatorname{par}(Q')}-H_{Q'})\le h .
+\end{equation}
+At each active \(Q\), for each fixed \(x_{\hat s}\), the mask is zero
+along \(I_s(Q)\) if the test for \(s,Q\) fails. Otherwise \(H_Q\le
+\ind_{A_0}\) and the density bound holds there. In particular,
+for \(I\subseteq I_s(Q)\) of length at least \(2^{-(d+1)}|I_s(Q)|\),
+\begin{equation}\label{eq:fiber}
+          \frac1{|I|}\int_I H_Q(y_s,x_{\hat s})\dd y_s
+                                      \le 2^{d+1}K h/a_s .
+\end{equation}
+
+A failed ancestor test in coordinate \(s\) puts the entire fiber
+\((I_s(Q),x_{\hat s})\) in \(U_s\), so \(G_s\) is zero along that
+interval. If \(s=b\), this kills \(\Delta_k^bG_b(x)\). Otherwise it
+kills \(E_k^sG_s(x)\). Thus \(H\) may be replaced by \(H_Q\) in the
+pruned form. We will use this replacement also after decomposing the
+low paths. For that use their residuals must vanish whenever the
+corresponding average is zero.
+
+
+\section{Stopping the coordinate martingales}\label{sec:stopping}
+
+Fix integers \(u<v\), a distinguished coordinate \(b\), and
+\(0\le G_i\le\ind_{A_i}\) with \(a_i=|A_i|<\infty\). Write
+\(0\le H\le\ind_{A_0}\), \(0<h=|A_0|\le\min_{i\in[d]}a_i\), and
+\(R=\max_{i\in[d]}a_i/h\). We can take the coefficients \(c_k\) real
+by splitting their real and imaginary parts. All martingales below are
+finite. We run the low martingales \(X^i_k=E^i_kG_i\), \(i\ne b\),
+from \(u\) to \(T=v+d+1\), so their values are available on every
+staggered interval used in the box recursion. For the high martingale
+put \(Y_u=0\) and \(Y_{k+1}-Y_k=c_k\Delta^b_kG_b\) for \(u\le k<v\).
+For every \(1<s<\infty\) the scalar martingale transform inequality \cite{Burkholder} gives
+\(\anorm{Y_v}_s\lesssim_s a_b^{1/s}\).
+
+For a path \(M=(M_k)_{u\le k\le t}\) write
+\(\operatorname{TV}(M)=\sum_{k=u}^{t-1}|M_{k+1}-M_k|\).
+Given \(0<\alpha\le1\), set \(Z^\alpha_u(M)=M_u\).
+Keep the last recorded value until the first subsequent time at which
+the distance from it is at least \(\alpha\), record the new value, and
+repeat. For the nonnegative martingales \(X^i\) also record a zero
+whenever the last recorded value is nonzero. Almost surely a
+nonnegative martingale that reaches zero stays there on the remaining
+finite time interval. In particular,
+\begin{equation}\label{eq:stop-tracking}
+ e^\alpha_k(M)=M_k-Z^\alpha_k(M),\qquad
+ |e^\alpha_k(M)|\le\alpha,\qquad
+ e^\alpha_k(X^i)=0\ \text{wherever }X^i_k=0 .
+\end{equation}
+The recorded path and the error are adapted to the same one-coordinate
+filtration as \(M\).
+
+\begin{lemma}\label{lem:stop-var}
+Let \(Z=Z^\alpha(M)\), where \(M=X^i\) or \(M=Y\), and let \(a=a_i\)
+or \(a=a_b\), respectively. Uniformly in the endpoints and in \(\alpha\),
+\begin{align}
+ \anorm{\alpha\operatorname{TV}(Z)}_q
+        &\lesssim_q a^{1/q}\qquad(1\le q<\infty),\label{eq:stop-var}\\
+ \int_{\R^d}\sum_k|Z_{k+1}-Z_k|^2&\lesssim a .\label{eq:stop-squares}
+\end{align}
+For \(M=X^i\), on a generation-\(k\) interval \(I\) in coordinate \(i\)
+write the two child error values as
+\(e^\alpha_{k+1}=e^\alpha_k+p_k+h_I d_k\), where \(p_k,d_k\) are
+constant in \(I\) with the other coordinates fixed. Then
+\begin{equation}\label{eq:stop-drift}
+ |p_k|\le2\alpha,\quad |d_k|\le\alpha,\quad
+ \sum_k\anorm{p_k}_1\lesssim a_i/\alpha,\qquad
+ \sum_k\anorm{d_k}_2^2\lesssim a_i .
+\end{equation}
+\end{lemma}
+\begin{proof}
+Include the initial time and the terminal time in the sequence of
+recording times \(\tau_j\), repeating the terminal time if necessary.
+The last, artificially included terminal value need not be assigned to
+the recorded path. Put
+\[
+                V=\sum_j|M_{\tau_{j+1}}-M_{\tau_j}|^2 .
+\]
+The recording times are bounded stopping times. On each initial dyadic
+interval in the active coordinate, with the others fixed,
+\((M_{\tau_j})_j\) is a martingale for the stopped filtration. The
+scalar martingale square-function inequality at exponent \(2q\) gives
+\(\anorm{V}_q\lesssim_q\anorm{M_t}_{2q}^2\). This also holds on
+\(\R^d\): raise the local estimate to the \(q\)-th power, sum over
+the disjoint initial intervals and integrate the fixed coordinates.
+Here \(\anorm{M_t}_{2q}^{2q}\lesssim_q a\) by contraction or by the
+martingale transform bound. Each genuine jump of \(Z\) occurs among
+the differences defining \(V\), proving \eqref{eq:stop-squares}.
+
+A jump of size \(s\ge\alpha\) contributes \(\alpha s\le s^2\) to
+\(\alpha\operatorname{TV}(Z)\). The optional jump to zero of size
+less than \(\alpha\) occurs at most once. If a regular jump occurred
+earlier, its square covers this additional cost, which is at most
+\(\alpha^2\). Otherwise the cost is \(\alpha|M_u|\). Consequently
+\(\alpha\operatorname{TV}(Z)\le2V+\alpha|M_u|\), which proves
+\eqref{eq:stop-var}.
+
+Finally \(p_k=-E_k^i(Z_{k+1}-Z_k)\). Its \(L^1\) estimate follows
+from \eqref{eq:stop-var}. Since
+\[
+ |d_k|^2\le E_k^i|e^\alpha_{k+1}-e^\alpha_k|^2
+ \le 2E_k^i\bigl(|X^i_{k+1}-X^i_k|^2+|Z_{k+1}-Z_k|^2\bigr),
+\]
+martingale orthogonality and \eqref{eq:stop-squares} give the last
+bound in \eqref{eq:stop-drift}. The pointwise estimates follow from
+\eqref{eq:stop-tracking} and the two-child representation.
+\end{proof}
+
+\begin{lemma}\label{lem:all-coarse}
+For any integer \(N\ge0\), put \(\delta=2^{-N}\). For \(1<q<\infty\),
+\[
+ \left|\int_{\R^d}H\sum_{k=u}^{v-1}
+       \left(\prod_{i\ne b} Z^\delta_k(X^i)\right)(Y_{k+1}-Y_k)\right|
+ \lesssim_{d,q} (N+1)^d h R^{1/q}.
+\]
+\end{lemma}
+\begin{proof}
+For each of the \(d\) paths use the layers \(M^{[0]}=Z^1(M)\) and
+\(M^{[n]}=Z^{2^{-n}}(M)-Z^{2^{1-n}}(M)\) for \(1\le n\le N\).
+They sum to \(Z^\delta(M)\). For all positive levels,
+\(\sup_k|M_k^{[n]}|\le3\,2^{-n}\) by \eqref{eq:stop-tracking}.
+For a low path this bound, with the same constant, holds also at
+level zero, since \(0\le X^i\le1\). The high path at level zero
+may be unbounded. For either type of path, \eqref{eq:stop-var} gives
+\begin{equation}\label{eq:stop-layer}
+    \anorm{\operatorname{TV}(M^{[n]})}_q\lesssim_q 2^n a^{1/q},
+    \qquad 0\le n\le N.
+\end{equation}
+In particular every occurrence of a variation in the following
+integrals obeys
+\[
+ \int_{\R^d} H\,\operatorname{TV}(M^{[n]})
+ \le h^{1-1/q}\anorm{\operatorname{TV}(M^{[n]})}_q
+ \lesssim_q 2^n h R^{1/q}.
+\]
+
+First take \(Z^\delta(Y)\) in place of \(Y\). In its layer expansion
+fix low levels \(n_i\), let \(m\) be the high level, and write
+\(L_k=\prod_{i\ne b}(X^i)^{[n_i]}_k\). If \(m\le\max_{i\ne b}n_i\),
+bound the sum pointwise by \(\sup|L|\,\operatorname{TV}(Y^{[m]})\).
+After integration this costs at most a constant times
+\(2^{m-\sum_i n_i}hR^{1/q}\le hR^{1/q}\), using only the variation
+estimate for \(Y^{[0]}\) when \(m=0\).
+
+If \(m>\max_{i\ne b}n_i\), then \(m\ge1\). For real paths \(L,W\)
+on the finite time interval, discrete summation by parts gives
+\[
+ \left|\sum_{k=u}^{v-1}L_k(W_{k+1}-W_k)\right|
+ \le \sup_k|W_k|\bigl(2\sup_k|L_k|+\operatorname{TV}(L)\bigr).
+\]
+Apply this with \(W=Y^{[m]}\) and use the product bound
+\[
+\operatorname{TV}(L)\le
+\sum_{r\ne b}\operatorname{TV}((X^r)^{[n_r]})
+\prod_{i\ne b,r}\sup_k|(X^i)_k^{[n_i]}| .
+\]
+The endpoint terms cost \(O_d(h)\). For the variation in slot \(r\) the
+bound, up to a constant, is
+\[
+             2^{-m+n_r-\sum_{i\ne b,r}n_i}hR^{1/q}\le hR^{1/q}.
+\]
+There are \((N+1)^d\) choices of the levels.
+
+For the remaining path \(W=Y-Z^\delta(Y)\) we have \(\sup|W|\le\delta\).
+Take \(L=\prod_{i\ne b}Z^\delta(X^i)\) in the same summation-by-parts
+bound. All low factors lie between zero and one, so
+\(\operatorname{TV}(L)\le\sum_{i\ne b}\operatorname{TV}(Z^\delta(X^i))\).
+H\"older's inequality on \(A_0\) and \eqref{eq:stop-var} bound the
+result by \(O_{d,q}(hR^{1/q})\).
+\end{proof}
+
+
+\section{An estimate for the residual terms}\label{sec:residual}
+Fix \(0<\delta=2^{-N}\le1/2\), and a nonempty subset
+\(D\subseteq[d]\setminus\{b\}\). For \(i\ne b\) let the low path \(L_i\)
+be \(e_i^\delta=X_i-Z_i^\delta\) if \(i\in D\), and \(X_i\) otherwise.
+Here \(X_i=E^i G_i\) is the martingale of the pruned input from
+Section~\ref{sec:prune}. Write \(\Lambda(L)\) for the form on the
+left in the following estimate. We will prove
+\begin{equation}\label{eq:resbound}
+ \left|\sum_{k=u}^{v-1}c_k\int H_Q\,\Delta_k^bG_b
+                     \prod_{i\ne b}L_{i,k}\right|
+ \ \lesssim_{d,K}\ h+hR\,\delta^{\,2^{-d}} .
+\end{equation}
+Inside each integral \(Q\) denotes the level-\(k\) cube containing the
+integration point. Extend all low paths to level \(v+d+1\) to allow
+the offsets in the calculation below.
+
+For an interval \(I\) in coordinate \(i\), write \(L_{i,I}\) for its
+path value, a function of the other coordinates. Its values on the two
+children are \(L_{i,I}+p_{i,I}\pm d_{i,I}\).
+Write \(\sigma_i=\delta\) if \(i\in D\), and \(\sigma_i=1\) otherwise.
+Then \(|L_{i,I}|,|d_{i,I}|\le\sigma_i\) and
+\(|p_{i,I}|\le2\sigma_i\). On a true martingale \(p_{i,I}=0\).
+By \eqref{eq:stop-drift} for residuals and by orthogonality for true
+martingales we have
+\begin{align}
+ \sum_k\int |d_{i,k}|^2&\lesssim a_i, &
+ \sum_k\int |p_{i,k}|&\lesssim a_i/\delta\quad(i\in D).\label{eq:dp}
+\end{align}
+
+\paragraph{Box energies.}
+Let \(b\in J\subseteq[d]\) and \(n=2^{|J|}\). On a dyadic rectangle
+\(V=\prod I_i\), choose two independent uniform samples \(x_j^0,x_j^1\)
+in \(I_j\) for each \(j\in J\) and one \(x_i\) in \(I_i\) otherwise,
+all mutually independent. Write \(x^\omega\) for the corner selected
+by \(\omega\in\{0,1\}^J\). With the mask of the cube \(Q\) fixed, put
+\[
+ B_J(V;Q)=\E\prod_\omega
+       \left[ H_Q(x^\omega)\prod_{i\notin J} L_{i,I_i}(x^\omega)\right].
+\]
+Let \(S_i\) average a function of the rectangle over its two
+\(i\)-children, holding \(Q\) fixed, and write \(\partial_i=S_i-I\).
+If \(j\in J\), condition on the other coordinates. The two arms of the
+product are the same real function \(C\) evaluated on independent
+samples. Thus \(B_J\ge0\) and \(\partial_jB_J\ge0\), even with signed
+residuals. More precisely the conditional value of \(\partial_j B_J\)
+is \(\avg{h_{I_j}C}{I_j}^2\), since
+\[
+  \tfrac12\sum_{I'\text{ child of }I}\avg C{I'}^2-\avg CI^2
+     =\avg{h_I C}{I}^2,\qquad
+     h_I=\ind_{I_{\rm left}}-\ind_{I_{\rm right}}.
+\]
+Here \(\avg{\cdot}{I}\) denotes normalized integration on \(I\).
+
+For fixed offsets \(0\le\nu_i\le |J|-1\) let \(\mathcal V_{k,\nu}\)
+be the grid of rectangles with lengths \(2^{-k-\nu_i}\), each with
+its enclosing level-\(k\) cube \(Q_k(V)\). Define
+\[
+ U(J)=\max_{\nu,\,j\in J}
+    \sum_{k=u}^{v-1}\sum_{V\in\mathcal V_{k,\nu}}
+       |V|\,\partial_j B_J(V;Q_k(V)).
+\]
+All grid sums at a single level are absolutely integrable, by keeping
+one central factor. On the initial grid Cauchy--Schwarz and the
+orthogonality of the \(b\)-martingale differences give
+\begin{equation}\label{eq:first}
+            |\Lambda(L)|\le \sqrt{a_b\,U(\{b\})}.
+\end{equation}
+Indeed the two factors in Cauchy--Schwarz are the Haar coefficients
+in the \(b\)-variable of \(G_b\) and of \(H_Q\prod_{i\ne b}L_{i,I_i}\).
+The latter square is exactly \(\partial_bB_{\{b\}}\).
+
+\paragraph{One step of the recursion.}
+Write \(\gamma=\prod_{i\notin J}\sigma_i\).
+The grid sum of \((\prod_i S_i-I)B_J\) is bounded above by
+\(n h\,\gamma^n\). To see this, telescope in \(k\), inserting the
+new mask at each child. The initial box has a minus sign and the last
+new mask is zero. Only central factors change when replacing inherited
+by new functions, since each path is already evaluated at the actual
+level of its own interval. In each of the \(n\) resulting differences,
+use all low amplitudes, discard the other central factors, and sum the
+one mask drop using \eqref{eq:drop}. At a fixed level the staggered
+child rectangles partition each new cube, so its integrated drop is
+counted once for each choice of the changed corner.
+
+Expand \(\prod_i S_i-I\) as a sum of the individual differences with
+preceding refinements, placing the marked coordinate \(j\) first.
+Differences in the other reflected coordinates are nonnegative.
+To bound \(U(J)\) above we can therefore add the absolute contributions
+of the unreflected differences to the preceding boundary bound. The
+preceding refinements in a term for \(i\notin J\) produce one grid
+whose offsets are at most \(|J|\), permitted for \(U(J\cup\{i\})\).
+
+On such a rectangle put \(A_\omega=L_{i,I_i}(x^\omega)\), and denote
+the associated drift and half-difference by \(p_\omega,d_\omega\).
+They are independent of the base \(i\)-sample. Let \(C(y)\) be the
+product of all central factors and all factors of types other than
+\(i\), with the base \(i\)-coordinate set to \(y\).
+To compute \(\partial_i B_J\), average over the child signs the
+product of \(A_\omega+p_\omega\pm d_\omega\), multiplied by the
+child average of \(C\), and subtract the parent expression.
+The term using only \(A\)'s cancels. In each expanded term the base
+average is \(\avg{h_{I_i}^{\,m}C}{I_i}\), where \(m\) is the
+number of selected \(d\)'s. The following bounds are for the absolute
+grid contributions, using the outer expectations over all remaining
+samples.
+
+\begin{enumerate}
+\item If a \(p\) occurs, retain one \(p_\alpha\) and bound the
+other \(n-1\) factors of that type by \(2\sigma_i\).
+If there is no \(p\) and at least two \(d\)'s, use
+\(2|d_\alpha d_\beta|\le |d_\alpha|^2+|d_\beta|^2\) and bound
+the remaining \(n-2\) factors by \(\sigma_i\).
+All other low types supply \(\prod_{\ell\notin J,\ \ell\ne i}\sigma_\ell^n\).
+In both cases \eqref{eq:dp} bounds the sum by a constant times
+\begin{equation}\label{eq:multiple}
+         a_i\sigma_i^{n-2}
+                \prod_{\ell\notin J,\ \ell\ne i}\sigma_\ell^n .
+\end{equation}
+The drift case has \(\sigma_i=\delta\). To apply \eqref{eq:dp}, the
+marginal of the retained corner is uniform on its rectangle and
+the \(i\)-levels \(k+\nu_i\) are distinct. This observation applies
+to each fixed staggered grid.
+
+\item If exactly one \(d_\alpha\) and no \(p\) occurs, apply
+Cauchy--Schwarz over the grid and outer samples. Put \(d_\alpha\)
+and the \(n-1\) remaining \(A_\omega\)'s in the first factor.
+The second square is the grid sum of \(\avg{h_{I_i} C}{I_i}^2\).
+Reflecting the new coordinate \(i\) identifies this with a marked
+energy for \(J\cup\{i\}\). By \eqref{eq:dp} the resulting bound is
+\begin{equation}\label{eq:single}
+               O_d\big(\sigma_i^{n-1}\sqrt{a_i U(J\cup\{i\})}\big).
+\end{equation}
+\end{enumerate}
+
+At \(J=\{b\}\) and \(i\in D\) we need a better version of
+\eqref{eq:multiple}. Retain both central factors. Conditional on the
+arguments of the retained \(p_\alpha\) or \(d_\alpha^2\) and on the
+base \(i\)-sample \(y\), the opposite corner has a fresh \(b\)-sample.
+Its central factor has conditional mean at most \(C_dKh/a_b\) by
+\eqref{eq:fiber}. The central factor at \(\alpha\) can then be
+integrated in \(y\) with mean at most \(C_dKh/a_i\), independently
+of the retained coefficient. Absolute values of the child Haar signs
+are one. Thus \eqref{eq:multiple} at this step is at most
+\(C_{d,K}h^2/a_b\), since \(n=2\). This is the only step at which a
+drift or a double difference of a residual could consume all its
+small factors.
+
+\paragraph{Closing the recursion.}
+Set \(M=hR=\max_i a_i\). Downward induction using the boundary,
+\eqref{eq:multiple}, and \eqref{eq:single} first gives
+\(U(J)\lesssim_d M\) for every \(J\), including the terminal
+\(J=[d]\). For \(|J|\ge2\) and \(D\setminus J\ne\varnothing\) it gives
+the sharper bound
+\[
+        U(J)\lesssim_d M\delta^{\,2^{-(d-|J|)}} .
+\]
+Indeed the boundary has a factor \(\delta^n\), and every multiple
+term has at least \(\delta^{n-2}\), with \(n\ge4\).
+A singleton at a residual type gains \(\delta^{n-1}\) by
+\eqref{eq:single} and the crude bound. A singleton at an ordinary
+type leaves a residual in the next node, so one takes the square
+root of its inductive gain. The terminal implication is vacuous
+when all types have been reflected.
+
+At \(J=\{b\}\) the boundary and the multiple terms for ordinary
+types retain a factor \(\delta^2\). The multiple terms for residual
+types were bounded by \(C_{d,K}h^2/a_b\). For a singleton at a
+residual type use its factor \(\delta\), and for an ordinary type
+use the next node's gain. Hence
+\[
+ U(\{b\})\lesssim_{d,K}h^2/a_b+M\delta^{\,2^{-(d-1)}}.
+\]
+Together with \eqref{eq:first} and \(a_b\le M\) this proves
+\eqref{eq:resbound}. This argument also covers \(d=2\), where
+the only singleton at the first node is a residual type.
+
+
+\section{Restricted and strong estimates}
+\begin{proof}[Proof of Proposition~\ref{prop:dyadic}]
+First suppose \(h\le\min_{i\ge1}a_i\). For the pruned inputs set
+\[
+       N=\max\{1,\lceil 2^d\log_2 R\rceil\},\qquad \delta=2^{-N}.
+\]
+On the low slots write \(X_i=Z_i^\delta+e_i^\delta\). We use the identity
+\[
+ \prod_{i\ne b}X_i-\prod_{i\ne b}Z_i^\delta
+     =\sum_{\varnothing\ne D\subseteq[d]\setminus\{b\}}
+       (-1)^{|D|+1}\prod_{i\in D}e_i^\delta
+                       \prod_{i\notin D,\ i\ne b}X_i .
+\]
+For the term with all \(Z\)'s keep the original tester \(H\) and use
+Lemma~\ref{lem:all-coarse}. In each summand on the right insert \(H_Q\).
+This is exact by Section~\ref{sec:prune} and the zero rule
+\eqref{eq:stop-tracking}. Now \eqref{eq:resbound} costs \(O_{d,K}(h)\)
+per summand since \(R\delta^{2^{-d}}\le1\).
+
+Write \(t_*=\min_{i\ge1}t_i\), and choose \(q>2/t_*\).
+Since \(N\lesssim_d 1+\log R\),
+\[
+   (1+N)^d R^{1/q}\lesssim_{d,\vec t} R^{t_*}
+        \le \prod_{i=1}^d (a_i/h)^{t_i}=W/h .
+\]
+Restoring the discarded inputs now gives
+\begin{equation}\label{eq:small-bound}
+            |\Lambda_b(\vec F)|
+                 \le (C_{d,K,\vec t}+\delta_K C)W,\qquad
+                   \delta_K=dK^{-t_*}.
+\end{equation}
+
+
+For arbitrary support sizes fix \(L>d\). For each \(a_i<h/L\) put
+\(V_i=\{M_i\ind_{A_i}>L a_i/h\}\).
+Restricting the tester to their union costs \(C(d/L)^{t_0}W\).
+On each \(i\)-fiber replace \(F_i\) on the maximal intervals of
+\(V_i\) by its interval average. Every dyadic average and difference
+of the resulting input agrees with that of \(F_i\) at points outside
+\(V_i\). Almost every point of \(A_i\) belongs to \(V_i\).
+The replacement has support of measure at most \(h/L\) and size at
+most \(2L a_i/h\), by the maximal intervals' parent densities.
+Divide by this size bound and enlarge the supporting set to measure
+\(h\). For \(h/L\le a_i<h\) enlarge the support to measure \(h\)
+directly. Use the original support of measure \(h\) for the
+remaining tester. This places the normalized data under
+\eqref{eq:smalltest}. Undoing the normalization increases the
+target relative to the original \(W\) by at most \((2L)^d\).
+For example, each replaced input costs a ratio
+\(2L(a_i/h)^{1-t_i}\le 2L\).
+Equation \eqref{eq:small-bound} implies
+\[
+ C\le (2L)^d C_{d,K,\vec t}+
+          \big[(d/L)^{t_0}+(2L)^d\delta_K\big] C .
+\]
+First choose \(L\), then \(K\), so that the bracket is at most
+\(1/2\). This proves the uniform restricted bound. Every tuple with all
+\(t_i>0\) belongs to a relative open neighborhood in the H\"older
+hyperplane on which these restricted bounds hold. Multilinear restricted-type interpolation
+gives the asserted strong estimate \cite{GT}.
+\end{proof}
+
+\section{Continuous multipliers and truncations}\label{sec:continuum}
+Take \(t_i=1/p_i\) for \(i\in[d]\) and \(t_0=1-1/p\) for the
+dual tester. We give the comparison with \eqref{eq:dyadic} to
+keep track of uniformity in the scales and the choice of \(b\).
+For a one-dimensional profile \(\phi\) put
+\(\phi_k(y)=2^k\phi(2^k y)\), and let \(*_i\) denote convolution in
+coordinate \(i\). For the exponents of Proposition~\ref{prop:dyadic}
+the separated sum
+\begin{equation}\label{eq:smoothcone}
+   \sum_{k=u}^{v-1} c_k(\psi_k*_b f_b)
+                   \prod_{i\ne b}(\phi_{i,k}*_i f_i)
+\end{equation}
+is bounded in \(L^p\) by the product of the input norms times a
+constant controlled by finitely many profile seminorms. Here the
+profiles are Schwartz, \(\widehat\psi\) is supported in a fixed
+compact annulus, and \(\phi_{i,k}=(\phi_i)_k\).
+
+To prove this, let \(A(y)=(1-|y|)_+\). First replace each
+\(\phi_i\) by \((\int\phi_i)A\). The difference profile has integral
+zero and a bounded square function on every \(L^q,\ 1<q<\infty\).
+Indeed, writing this difference as \(a\), one has
+\(\lvert\widehat a(\zeta)\rvert\lesssim
+ \min(|\zeta|,|\zeta|^{-1})\) by its finite first moment and
+integrable derivative. The kernels \(\sum_k\varepsilon_k a_k\)
+have a uniform \(L^2\) multiplier bound and the usual
+Calder\'on--Zygmund estimates, uniformly over signs and finite
+sums. For the kernel estimates one sums the dilated bounds on
+\(a\) and its derivative; the tent is compactly supported and
+Lipschitz. The scalar singular integral theorem and Khintchine's
+inequality give the square estimate. The same argument applies
+to \(\psi\). In the telescoping replacement of the low profiles
+bound the two square functions by pointwise Cauchy--Schwarz in
+\(k\), and dominate every remaining low factor by a directional
+maximal function. H\"older gives the required bound for all errors.
+
+For a finite scale interval, translating a dyadic grid uniformly
+over a period of its coarsest scale makes the expected kernel of
+averaging on intervals of length \(u_0\) equal to
+\(u_0^{-1}A(\cdot/u_0)\). This is the probability that two points
+lie in the same interval, divided by its length. Take independent
+translates in all coordinates and dilate the \(b\)-grid by a fixed
+\(\lambda>0\). The dyadic estimate on these grids follows by
+translation and a change of scale in that coordinate.
+The expected difference kernel in \(b\) has Fourier multiplier
+\(D(2^{-k}\zeta)\), with
+\[
+     D(z)=\widehat A(\lambda z/2)-\widehat A(\lambda z).
+\]
+Choose \(\lambda\) small enough that \(D\) has no zeros on
+\(\supp\widehat\psi\), using the nonzero quadratic coefficient of
+\(\widehat A\) at zero. Let \(V_k\) have one-dimensional symbol
+\((\widehat\psi/D)(2^{-k}\zeta)\), smoothly extended by zero.
+Apply the dyadic bound using coefficients \(c_k\varepsilon_k\)
+and the distinguished input \(\sum_l\varepsilon_l V_l^{\,b}f_b\).
+This input has \(L^{p_b}\) norm \(\lesssim\|f_b\|_{p_b}\)
+uniformly in the signs, by the scalar multiplier theorem and
+finite overlap of its bands. Expectation over independent signs
+retains precisely \(l=k\). Averaging the grids now gives
+\eqref{eq:smoothcone} with all its low profiles equal to \(A\).
+Duality against \(L^{p'}\) justifies the averaging in the norm bound.
+
+Decompose \(m\) by a dyadic annular partition and then by a smooth
+partition into regions where \(|\eta_b|\gtrsim|\eta|\).
+On rescaling each piece to unit size, expand in a Fourier series
+on a fixed cube, with a smooth product cutoff equal to one on
+the piece and supported inside the period cube. The cutoff in
+coordinate \(b\) may be chosen in a fixed annulus. The coefficient
+of mode \(n\in\Z^d\) at any scale is bounded by
+\(C_{d,N}[m]_N(1+|n|)^{-N}\) by integration by parts. For this
+mode the separated profiles in \eqref{eq:smoothcone} are fixed
+up to translations determined by \(n\), and their required seminorms
+grow at most polynomially in \(|n|\). Taking \(N\) large enough
+allows absolute summation in operator norm. Proposition~\ref{prop:dyadic} applies to every choice of \(b\).
+Dominated convergence on the Fourier side for Schwartz inputs
+and Fatou's lemma give \eqref{eq:bound}.
+
+For hard truncations let \(\mathcal K=\mathcal F^{-1}m\), with
+off-origin kernel \(K\). Smooth Mihlin bounds give
+\(|K(y)|+|y||\nabla K(y)|\lesssim |y|^{-d}\), with constants
+controlled by finitely many seminorms. Indeed each frequency piece
+at radius \(2^k\), differentiated \(\ell=0,1\) times in space, is
+bounded by \(C 2^{k(d+\ell)}(1+2^k|y|)^{-d-2}\) by integration
+by parts, and the sum is geometric. Take a smooth mollifier \(\rho\)
+of mass one supported in the unit ball and write
+\(\rho_r(y)=r^{-d}\rho(y/r)\). Uniformly in \(r>0\),
+\[
+       \|\ind_{\{|y|>r\}}K-\mathcal K*\rho_r\|_1\lesssim 1.
+\]
+On \(|y|\le2r\) use
+\(|\mathcal K*\rho_r|\le\|m\|_\infty\|\widehat{\rho_r}\|_1
+\lesssim r^{-d}\) and integrate \(|K|\) on \(r<|y|\le2r\).
+On \(|y|>2r\) the mean value theorem bounds the difference by
+\(Cr|y|^{-d-1}\). Consequently the hard annulus differs by a uniformly
+bounded \(L^1\) kernel from the operator kernel with multiplier
+\[
+          m(\eta)\big(\widehat\rho(\epsilon\eta)-\widehat\rho(R\eta)\big).
+\]
+This symbol has uniform Mihlin seminorms. For the \(L^1\) error
+Minkowski and H\"older bound its operator norm by its kernel norm.
+This proves the uniform estimate for every smooth Mihlin kernel.
+
+For \(K(y)=|y|^{-d}\Omega(y/|y|)\) with smooth mean-zero \(\Omega\),
+the principal-value distribution has a smooth Mihlin multiplier.
+For completeness, partition \(K\) into smooth radial annular pieces.
+The piece at scale \(r\), rescaled to unit size, is smooth and has
+integral zero. At \(r|\eta|\le1\) its Fourier transform is
+\(O(r|\eta|)\), and its derivatives of order \(n\ge1\) are \(O(r^n)\).
+At \(r|\eta|>1\) integration by parts gives
+\(O_M(r^n(r|\eta|)^{-M})\) for derivatives of order \(n\ge0\).
+Summing proves the stated symbol estimates.
+
+For Schwartz inputs, near zero subtract \(\prod_i f_i(x)\);
+the difference is \(O_M(|y|(1+|x|)^{-M})\) for \(|y|\le1\).
+For \(|y|\ge1\) the product decays faster than any inverse power
+of \(1+|x|+|y|\), since \((x,y)\mapsto(x-y_i e_i)_{i=1}^d\)
+is injective for \(d\ge2\). These estimates give norm convergence
+on Schwartz data. Multilinearity, density, and the uniform bound
+complete the proof of Theorem~\ref{thm:main}.
+
+\begin{thebibliography}{99}
+\bibitem{Bernicot}
+F.~Bernicot, \emph{Fiber-wise Calder\'on--Zygmund decomposition and
+application to a bi-dimensional paraproduct},
+Illinois J. Math. \textbf{56} (2012), 415--422.
+\href{https://arxiv.org/abs/1011.3614}{arXiv:1011.3614}.
+\bibitem{Burkholder}
+D.~L.~Burkholder, \emph{Martingale transforms},
+Ann. Math. Statist. \textbf{37} (1966), 1494--1504.
+\href{https://doi.org/10.1214/aoms/1177699141}{doi:10.1214/aoms/1177699141}.
+\bibitem{CDR}
+M.~Christ, P.~Durcik, and J.~Roos,
+\emph{Trilinear smoothing inequalities and a variant of the triangular
+Hilbert transform}, Adv. Math. \textbf{390} (2021), 107863.
+\href{https://doi.org/10.1016/j.aim.2021.107863}{doi:10.1016/j.aim.2021.107863}.
+\bibitem{DemeterThiele}
+C.~Demeter and C.~Thiele,
+\emph{On the two-dimensional bilinear Hilbert transform},
+Amer. J. Math. \textbf{132} (2010), 201--256.
+\href{https://doi.org/10.1353/ajm.0.0101}{doi:10.1353/ajm.0.0101}.
+\bibitem{DFR}
+P.~Durcik, M.~Fraccaroli, and J.~Roos,
+\emph{A curved three-dimensional simplex Hilbert transform},
+preprint (2026). \href{https://arxiv.org/abs/2610.24850}{arXiv:2610.24850}.
+\bibitem{DR}
+P.~Durcik and J.~Roos,
+\emph{Averages of simplex Hilbert transforms},
+Proc. Amer. Math. Soc. \textbf{149} (2021), 633--647.
+\href{https://doi.org/10.1090/proc/15196}{doi:10.1090/proc/15196}.
+\bibitem{GT}
+L.~Grafakos and T.~Tao,
+\emph{Multilinear interpolation between adjoint operators},
+J. Funct. Anal. \textbf{199} (2003), 379--385.
+\href{https://arxiv.org/abs/math/0111141}{arXiv:math/0111141}.
+\bibitem{Kovac}
+V.~Kova\v{c}, \emph{Boundedness of the twisted paraproduct},
+Rev. Mat. Iberoam. \textbf{28} (2012), 1143--1164.
+\href{https://doi.org/10.4171/RMI/707}{doi:10.4171/RMI/707}.
+\bibitem{LS}
+F.~Y.-H.~Lin and L.~Slav\'ikov\'a,
+\emph{Rough averages of triangular Hilbert transforms},
+preprint (2026). \href{https://arxiv.org/abs/2607.20206}{arXiv:2607.20206}.
+\end{thebibliography}
+\end{document}

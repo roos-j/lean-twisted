@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Joris Roos. All rights reserved.
+Copyright (c) 2026 Polona Durcik, Joris Roos. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 This file was assembled by Claude from the statement files
 `TwistedParaproduct/Auto/Defs.lean` and `TwistedParaproduct/Auto/Theorems.lean`

@@ -3,10 +3,10 @@
 version: "v0.4"
 
 project:
-  name: Formalization of bounds for higher-dimensional twisted paraproducts
+  name: Boundedness of higher-dimensional twisted paraproducts
   description: >-
-    This is a Lean 4 formalization of the Lebesgue space bounds for twisted
-    paraproducts in $\mathbb{R}^n$ for $n\ge 2$. The proof was developed with
+    This is a Lean 4 formalization of the Lebesgue space bounds for
+    higher-dimensional twisted paraproducts. The proof was developed with
     GPT-6.2 Astra Ultra. Formalization was done with GPT-6.2 Sol Light.
   authors:
     - Polona Durcik
@@ -23,7 +23,7 @@ classification:
     - 42B20
 
 sources:
-  - title: "Full-dimensional twisted paraproducts: a formalization blueprint"
+  - title: "Boundedness of higher-dimensional twisted paraproducts: a formalization blueprint"
     type: blueprint
     location: tp_blueprint.tex (in this repository)
     relationship: formalizes
