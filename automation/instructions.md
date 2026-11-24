@@ -37,3 +37,7 @@ Recorded at 2026-11-22T22:06:30-05:00 (recording time). Expose the proved main r
 Auto/Theorems.lean and define the isotropic operators, including twisted, in
 Auto/Defs.lean using the lean-dfr style. Copy the blueprint and Lean project
 to the standalone sibling repository lean-twisted.
+
+Recorded at 2026-11-23T21:24:12-05:00 (recording time). Keep only the Fourier estimate in blueprint Theorem bp:main and the Lean challenge. Move principal-value existence and identification to prose preceding the theorem. State the Lean bound with the twisted operator and the coordinate Mihlin–Hörmander seminorm.
+
+Verified at 2026-11-23T21:33:44-05:00. The default Lake build passed with the local package override. The blueprint compiled with pdflatex, its Lean example elaborated, and the solution proved the standalone challenge statement with its definitions. Auto.main_result and Auto.hardHomogeneous depend only on propext, Classical.choice, and Quot.sound.

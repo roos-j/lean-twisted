@@ -18,62 +18,39 @@ public section
 
 namespace Auto
 
-open MeasureTheory ENNReal SchwartzMap Topology Filter
-open scoped ENNReal FourierTransform
+open MeasureTheory SchwartzMap
+open scoped BigOperators ENNReal
 
-private theorem realExponents {d : ℕ} {p : ℝ≥0∞} {q : Fin d → ℝ≥0∞}
-    (hp : 1 < p ∧ p < ∞) (hq : ∀ i, 1 < q i ∧ q i < ∞)
-    (hpq : ∑ i, (q i)⁻¹ = p⁻¹) :
-    1 < p.toReal ∧ (∀ i, 1 < (q i).toReal) ∧
-      p.toReal⁻¹ = ∑ i, (q i).toReal⁻¹ := by
-  refine ⟨?_, fun i => ?_, ?_⟩
-  · simpa using ENNReal.toReal_strict_mono hp.2.ne hp.1
-  · simpa using ENNReal.toReal_strict_mono (hq i).2.ne (hq i).1
-  · have h := congrArg ENNReal.toReal hpq.symm
-    rw [ENNReal.toReal_sum (fun i _ => ENNReal.inv_ne_top.mpr (zero_lt_one.trans (hq i).1).ne')] at h
-    simpa only [ENNReal.toReal_inv] using h
-
-/-- **Main Fourier estimate.** The untruncated twisted multiplier satisfies an
-a priori estimate on Schwartz functions, with `q` indexing the input exponents. -/
-theorem main_result_fourier {d : ℕ} (hd : 2 ≤ d) {p : ℝ≥0∞} (hp : 1 < p ∧ p < ∞)
-    {q : Fin d → ℝ≥0∞} (hq : ∀ i, 1 < q i ∧ q i < ∞)
-    (hpq : ∑ i, (q i)⁻¹ = p⁻¹) :
-    ∃ C : ℝ, 0 < C ∧ ∀ (m : ℝ^d → ℂ) (B : ℝ), 0 ≤ B →
-      MikhlinHormander.MikhlinCondition (5 * d + 2) m B →
-      ∀ f : Fin d → 𝓢(ℝ^d, ℂ),
-        eLpNorm (twisted m f) p ≤ ENNReal.ofReal (C * B) * ∏ i, eLpNorm (f i) (q i) := by
-  obtain ⟨hp', hq', hs⟩ := realExponents hp hq hpq
-  simpa only [ENNReal.ofReal_toReal hp.2.ne, fun i => ENNReal.ofReal_toReal (hq i).2.ne] using
-    (fullMultiplier hd hq' hp' hs)
-
-/-- **Main theorem.** The spherical principal value for a smooth homogeneous
-mean-zero kernel exists at each point on Schwartz inputs, equals its twisted
-Fourier multiplier, and satisfies an a priori `L^p` estimate. -/
-theorem main_result {d : ℕ} (hd : 2 ≤ d) {p : ℝ≥0∞} (hp : 1 < p ∧ p < ∞)
-    {q : Fin d → ℝ≥0∞} (hq : ∀ i, 1 < q i ∧ q i < ∞)
-    (hpq : ∑ i, (q i)⁻¹ = p⁻¹)
-    (Ω : Metric.sphere (0 : ℝ^d) 1 → ℂ)
-    (hK : ContDiffOn ℝ (↑(⊤ : ℕ∞)) (homogeneousKernel Ω) {y | y ≠ 0})
-    (hΩ : (∫ ω, Ω ω ∂(volume : Measure (ℝ^d)).toSphere) = 0) :
-    ∃ (m : ℝ^d → ℂ) (C : ℝ), 0 ≤ C ∧
-      (∀ g : 𝓢(ℝ^d, ℂ),
-        (∫ y, compensatedPrincipalValue (homogeneousKernel Ω) g y) = ∫ ξ, m ξ * (𝓕⁻ g) ξ) ∧
-      ∀ f : Fin d → 𝓢(ℝ^d, ℂ),
-        (∀ x, Tendsto (fun a : ℝ × ℝ ↦ T_trunc (homogeneousKernel Ω) (fun i ↦ f i) x a.1 a.2)
-          hardEndpointFilter (𝓝 (twisted m f x))) ∧
-        T (homogeneousKernel Ω) (fun i ↦ f i) = twisted m f ∧
-        eLpNorm (T (homogeneousKernel Ω) (fun i ↦ f i)) p ≤
-          ENNReal.ofReal C * ∏ i, eLpNorm (f i) (q i) := by
-  obtain ⟨hp', hq', hs⟩ := realExponents hp hq hpq
-  obtain ⟨m, C, hC, hPair, h⟩ := hardHomogeneous hd Ω hK hΩ hq' hp' hs
-  refine ⟨m, C, hC, hPair, fun f => ?_⟩
-  obtain ⟨_, hlim, _, hbound⟩ := h f
-  have hT : T (homogeneousKernel Ω) (fun i ↦ f i) = twisted m f := by
-    haveI : hardEndpointFilter.NeBot := by unfold hardEndpointFilter; infer_instance
-    funext x
-    exact (hlim x).limUnder_eq
-  refine ⟨hlim, hT, ?_⟩
-  rw [hT]
-  simpa only [ENNReal.ofReal_toReal hp.2.ne, fun i => ENNReal.ofReal_toReal (hq i).2.ne] using hbound
+/-- The untruncated twisted paraproduct bound (Theorem `bp:main`). -/
+theorem main_result {d : ℕ} (hd : 2 ≤ d) {p : ℝ} {pᵢ : Fin d → ℝ}
+    (hpᵢ : ∀ i, 1 < pᵢ i) (hp : p⁻¹ = ∑ i, (pᵢ i)⁻¹) (hp₁ : p⁻¹ < 1) :
+    ∃ (s : ℕ) (C : ℝ≥0∞), C < ∞ ∧
+      ∀ (m : ℝ^d → ℂ), SmoothOffOrigin m → [m]_s < ∞ →
+        ∀ f : Fin d → 𝓢(ℝ^d, ℂ),
+          ‖twisted m f‖_[p] ≤ C * [m]_s * ∏ i, ‖f i‖_[pᵢ i] := by
+  have hp₀ : 0 < p := by
+    apply inv_pos.mp
+    rw [hp]
+    exact Finset.sum_pos (fun i _ => inv_pos.mpr (zero_lt_one.trans (hpᵢ i)))
+      ⟨⟨0, by omega⟩, Finset.mem_univ _⟩
+  obtain ⟨A, hA, hbound⟩ := fullMultiplier hd hpᵢ ((inv_lt_one₀ hp₀).mp hp₁) hp
+  let s := 5 * d + 2
+  let D : ℝ := (d : ℝ) ^ s
+  have hD : 0 ≤ D := by positivity
+  have : NeZero d := ⟨by omega⟩
+  refine ⟨s, ENNReal.ofReal (A * D), ENNReal.ofReal_lt_top, ?_⟩
+  intro m hm hfinite f
+  have hcoord : MikhlinHormander.CoordinateMikhlinCondition s m ([m]_s).toReal := by
+    refine ⟨ENNReal.toReal_nonneg, hm.of_le ?_, ?_⟩
+    · exact_mod_cast (show (s : ℕ∞) ≤ ⊤ from le_top)
+    intro k hk ζ hζ σ
+    apply (ENNReal.ofReal_le_iff_le_toReal hfinite.ne).mp
+    exact le_iSup_of_le (⟨k, Nat.lt_succ_of_le hk⟩ : Fin (s + 1))
+      (le_iSup_of_le σ (le_iSup_of_le ⟨ζ, hζ⟩ le_rfl))
+  have h := hbound m (D * ([m]_s).toReal) (mul_nonneg hD ENNReal.toReal_nonneg)
+    (MikhlinHormander.coordinateMikhlinCondition_to_mikhlinCondition hcoord) f
+  rw [← mul_assoc, ENNReal.ofReal_mul (mul_nonneg hA.le hD),
+    ENNReal.ofReal_toReal hfinite.ne] at h
+  exact h
 
 end Auto
