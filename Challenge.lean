@@ -30,6 +30,13 @@ scoped notation:max "ℝ^" n:max => EuclideanSpace ℝ (Fin n)
 def diagonalFrequency {d : ℕ} (ξ : Fin d → ℝ^d) : ℝ^d :=
   WithLp.toLp 2 (fun j => ξ j j)
 
+/-- The integrand of `twisted` (kept so `twisted` elaborates as in the solution). -/
+noncomputable def fourierIntegrand {d : ℕ} (m : ℝ^d → ℂ)
+    (f : Fin d → 𝓢(ℝ^d, ℂ)) (x : ℝ^d) (ξ : Fin d → ℝ^d) : ℂ :=
+  m (diagonalFrequency ξ) * (∏ j, (𝓕 (f j)) (ξ j)) *
+    Complex.exp (Complex.I * Complex.ofReal
+      (2 * Real.pi * inner ℝ x (∑ j, ξ j)))
+
 /-- The twisted Fourier operator of equation `bp:op`. -/
 noncomputable def twisted {d : ℕ} (m : ℝ^d → ℂ)
     (f : Fin d → 𝓢(ℝ^d, ℂ)) (x : ℝ^d) : ℂ :=

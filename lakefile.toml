@@ -8,7 +8,7 @@ relaxedAutoImplicit = false
 [[require]]
 name = "lean-spherical"
 git = "https://github.com/roos-j/lean-spherical.git"
-rev = "800b71afca91e42809c21e6e2fd9ae4f82467082"
+rev = "f0dde64dcef87118c1d1dc9253e039da8f3f0482"
 
 [[lean_lib]]
 name = "TwistedParaproduct"
