@@ -13,7 +13,9 @@
  {∃}{{\(\exists\)}}1 {∧}{{\(\land\)}}1 {≤}{{\(\le\)}}1
  {≠}{{\(\ne\)}}1 {∫}{{\(\int\)}}1 {∏}{{\(\prod\)}}1
  {∑}{{\(\sum\)}}1 {ξ}{{\(\xi\)}}1 {𝓕}{{\(\mathcal F\)}}1
- {‖}{{\(\Vert\)}}1 {⁻¹}{{\({}^{-1}\)}}1}
+ {‖}{{\(\Vert\)}}1 {⁻¹}{{\({}^{-1}\)}}1
+ {ᵢ}{{\({}_i\)}}1 {₁}{{\({}_1\)}}1 {≥}{{\(\ge\)}}1
+ {∞}{{\(\infty\)}}1 {𝓢}{{\(\mathcal S\)}}1}
 \hypersetup{pdftitle={Boundedness of higher-dimensional twisted paraproducts: a formalization blueprint}}
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
@@ -64,12 +66,16 @@ For a smooth angular function \(\Omega\) of spherical mean zero put
  T_K(\vec f)(x)=\operatorname{p.v.}\int_X K(y)
                               \prod_i f_i(x-y_i e_i)\dd y .
 \]
-Here the principal value is the joint limit over
-\(\epsilon<|y|<R\) as \(\epsilon\downarrow0,\ R\uparrow\infty\).
+The principal value is the joint limit over \(\epsilon<|y|<R\)
+as \(\epsilon\downarrow0\) and \(R\uparrow\infty\). For Schwartz inputs
+it exists at every \(x\) and agrees with \(T_{m_\Omega}(\vec f)(x)\),
+where \(m_\Omega\) is the Fourier symbol of the principal-value kernel.
+Lemmas~\ref{bp:homogeneous-symbol} and \ref{bp:hard-homogeneous}
+give the symbol and the pointwise limit, respectively.
 
 \begin{theorem}[A priori estimate on Schwartz functions]\label{bp:main}
-\lean{TwistedParaproduct.proveBanachTarget}
-\uses{bp:frechet,bp:full-multiplier,bp:homogeneous-symbol,bp:hard-homogeneous}
+\lean{Auto.main_result}
+\uses{bp:frechet,bp:full-multiplier}
 Suppose \(1<p_i<\infty\) and \(1/p=\sum_i1/p_i<1\).
 There are \(s\in\mathbb N\) and \(C<\infty\), depending only on
 \(d,\vec p\), such that for every \(m\) smooth away from the origin
@@ -78,18 +84,10 @@ with \([m]_s<\infty\), and all Schwartz inputs,
                 \norm{T_m(\vec f)}_{L^p(X)}
                 \le C[m]_s\prod_{i=1}^d\norm{f_i}_{L^{p_i}(X)} .
 \]
-For every \(K\) above the untruncated principal value exists for these
-inputs and equals \eqref{bp:op} with the principal-value Fourier symbol
-of \(K\). In particular
-\[
-               \norm{T_K(\vec f)}_{L^p(X)}
-                    \le C_{d,\vec p,\Omega}\prod_i\norm{f_i}_{L^{p_i}(X)} .
-\]
 \end{theorem}
 
-The proof of Theorem~\ref{bp:main} is assembled after the identification
-of the principal value. Appendix~\ref{bp:lean-target} gives the
-typechecked Lean proposition for its Fourier estimate.
+Appendix~\ref{bp:lean-target} gives the Lean declaration for
+Theorem~\ref{bp:main}.
 Appendix~\ref{sec:tpb-source-map} records exact library declarations
 and the interfaces that require further formalization.
 In the \LaTeX{} source, \verb|\lean| gives the proposed declaration name
@@ -100,10 +98,10 @@ and~\ref{bp:hard-homogeneous}.
 
 In Lean the
 inputs can be a family of \code{SchwartzMap} indexed by \code{Fin d}.
-Use \code{EuclideanSpace} for Fourier space and \code{eLpNorm} with
+The notation for Lebesgue norms wraps \code{eLpNorm}, which takes
 exponents \(\operatorname{ofReal}(p_i)\) and
-\(\operatorname{ofReal}(p)\). Quantify a positive real constant and take
-its image in \(\mathbb R_{\ge0}^{\infty}\) in the norm inequality.
+\(\operatorname{ofReal}(p)\). The constant \(C\) is a finite element
+of \(\mathbb R_{\ge0}^{\infty}\).
 All exponent reciprocals and all positive cutoffs in this text are
 ordinary real numbers. For coordinate integration, the standard
 orthonormal basis identifies \(X\) measure-preservingly with a finite
@@ -1505,59 +1503,33 @@ Taking \(Lp>d\) gives convergence in \(L^p\).
 \end{proof}
 
 \begin{proof}[Proof of Theorem~\ref{bp:main}]
-\uses{bp:full-multiplier,bp:frechet,bp:homogeneous-symbol,bp:hard-homogeneous}
-Use Lemma~\ref{bp:full-multiplier} with \(s=5d+2\) in
-\eqref{bp:op}. Lemma~\ref{bp:frechet} identifies its quantitative
-hypothesis with the bound in the Lean target. For a homogeneous
-mean-zero kernel, Lemma~\ref{bp:homogeneous-symbol} supplies a symbol
-with finite \([m_\Omega]_s\), and Lemma~\ref{bp:hard-homogeneous}
-identifies the untruncated principal value pointwise with
-\(T_{m_\Omega}\) on the same Schwartz inputs. Substitution gives the
-second inequality. All constants in the argument are independent of
-the scale endpoints.
+\uses{bp:full-multiplier,bp:frechet}
+Apply Lemma~\ref{bp:full-multiplier} with \(s=5d+2\) to
+\eqref{bp:op}. By Lemma~\ref{bp:frechet}, the Fréchet-derivative
+bound in that lemma is at most \(d^s[m]_s\). Absorb \(d^s\) into
+the constant.
 \end{proof}
 
 \clearpage
 \appendix
 \section{Lean statement of the Fourier estimate}\label{bp:lean-target}
-The following code elaborates using the library revisions in
-Appendix~\ref{sec:tpb-source-map}. It defines the proposition that the
-formalization must prove. The bound uses an explicit nonnegative upper
-bound \(B\) because real suprema in Lean are total even for unbounded
-sets. Lemma~\ref{bp:frechet} gives the conversion. The value of the
-symbol at zero can be arbitrary by Lemma~\ref{bp:schwartz-Fourier}.
+The Lean statement uses \code{twisted} for \(T_m\),
+\code{mihlinHormanderSeminorm} for \([m]_s\), and \code{lebesgueNorm}
+for the Lebesgue norms. The seminorm takes values in the extended
+nonnegative reals, so the hypothesis \([m]_s<\infty\) rules out an
+unbounded supremum. The value of \(m\) at the origin is immaterial by
+Lemma~\ref{bp:schwartz-Fourier}.
 \begin{lstlisting}
-import Mathlib.Analysis.Distribution.SchwartzSpace.Fourier
-import Mathlib.MeasureTheory.Function.LpSeminorm.Defs
+import TwistedParaproduct
+open scoped Auto BigOperators ENNReal SchwartzMap
 
-open MeasureTheory
-open scoped BigOperators FourierTransform
-
-namespace TwistedParaproduct
-abbrev E (d : ℕ) := EuclideanSpace ℝ (Fin d)
-
-noncomputable def twisted {d : ℕ} (m : E d → ℂ)
-    (f : Fin d → SchwartzMap (E d) ℂ) (x : E d) : ℂ :=
-  ∫ ξ : Fin d → E d,
-    m (WithLp.toLp 2 (fun j => ξ j j)) *
-      (∏ j, (𝓕 (f j)) (ξ j)) *
-      Complex.exp (Complex.I * Complex.ofReal
-        (2 * Real.pi * inner ℝ x (∑ j, ξ j)))
-
-def BanachTarget : Prop :=
-  ∀ (d : ℕ), 2 ≤ d → ∀ (p : Fin d → ℝ) (r : ℝ),
-    (∀ j, 1 < p j) → 1 < r → r⁻¹ = ∑ j, (p j)⁻¹ →
-    ∃ (N : ℕ) (C : ℝ), 0 < C ∧ ∀ (m : E d → ℂ) (B : ℝ),
-      0 ≤ B → (∀ n : ℕ, ContDiffOn ℝ n m {x | x ≠ 0}) →
-      (∀ k ≤ N, ∀ z : E d, z ≠ 0 →
-        ‖z‖ ^ k * ‖iteratedFDeriv ℝ k m z‖ ≤ B) →
-      ∀ f : Fin d → SchwartzMap (E d) ℂ,
-        eLpNorm (twisted m f) (ENNReal.ofReal r) volume ≤
-          ENNReal.ofReal (C * B) *
-            ∏ j, eLpNorm (fun x => f j x) (ENNReal.ofReal (p j)) volume
-
-#check TwistedParaproduct.BanachTarget
-end TwistedParaproduct
+example {d : ℕ} (hd : 2 ≤ d) {p : ℝ} {pᵢ : Fin d → ℝ}
+    (hpᵢ : ∀ i, 1 < pᵢ i) (hp : p⁻¹ = ∑ i, (pᵢ i)⁻¹) (hp₁ : p⁻¹ < 1) :
+    ∃ (s : ℕ) (C : ℝ≥0∞), C < ∞ ∧
+      ∀ (m : ℝ^d → ℂ), Auto.SmoothOffOrigin m → [m]_s < ∞ →
+        ∀ f : Fin d → 𝓢(ℝ^d, ℂ),
+          ‖Auto.twisted m f‖_[p] ≤ C * [m]_s * ∏ i, ‖f i‖_[pᵢ i] :=
+  Auto.main_result hd hpᵢ hp hp₁
 \end{lstlisting}
 For the spatial formulation, represent the untruncated value by
 \(\int K(y)(G_x(y)-G_x(0)\ind_{\{|y|\le1\}})\dd y\), where

@@ -61,17 +61,10 @@ related_formalizations:
 
 status:
   scope: >-
-    Auto.main_result_fourier: for d >= 2, 1 < p < infinity and 1 < q_i < infinity
-    with sum of 1/q_i equal to 1/p, the twisted Fourier multiplier operator T_m
-    satisfies ||T_m(f)||_p <= C B prod_i ||f_i||_{q_i} on Schwartz inputs, for every
-    multiplier m satisfying the Mikhlin condition of order 5d+2 with constant B.
-    Auto.main_result: for a homogeneous kernel K(y) = |y|^{-d} Omega(y/|y|) that is
-    smooth away from the origin with Omega of spherical mean zero, the joint
-    spherical principal value (inner radius to 0, outer radius to infinity) of the
-    physical-space operator exists pointwise on Schwartz inputs, equals T_m for the
-    principal-value Fourier symbol m of K, and satisfies the corresponding L^p bound.
-    Both are a priori estimates on Schwartz functions; extension to general L^q
-    inputs is not part of the compared statements.
+    Auto.main_result gives the untruncated twisted Fourier multiplier estimate
+    on Schwartz inputs in the open Banach range. For fixed dimension and
+    exponents, the estimate uses the finite coordinate Mihlin–Hörmander
+    seminorm of some order s.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms:
@@ -79,11 +72,6 @@ status:
     - Classical.choice
     - Quot.sound
   main_results:
-    - declaration: Auto.main_result_fourier
-      file: TwistedParaproduct/Auto/Theorems.lean
-      sorry_count: 0
-      axioms: [propext, Classical.choice, Quot.sound]
-      comparator_config: comparator.json
     - declaration: Auto.main_result
       file: TwistedParaproduct/Auto/Theorems.lean
       sorry_count: 0
@@ -119,22 +107,14 @@ automation:
 
 fidelity:
   divergences: >-
-    The blueprint's Theorem bp:main asserts the multiplier bound with some
-    smoothness order s; the Lean statement fixes s = 5d + 2. The Mikhlin condition
-    bounds the norms of all iterated Frechet derivatives of order at most s,
-    |z|^k ||D^k m(z)|| <= B, together with C^s smoothness away from the origin,
-    instead of the multi-index seminorm; the two are equivalent up to constants
-    depending on d and s. The exponent condition 1/p = sum 1/p_i < 1 is expressed
-    with extended-real exponents 1 < p < infinity and 1 < q_i < infinity. Smoothness
-    of Omega is stated as smoothness of the homogeneous kernel K away from the
-    origin. The principal value T is defined with limUnder, and Auto.main_result
-    proves that the limit exists. Auto.main_result additionally states that m is the
-    principal-value Fourier symbol of K, through the compensated pairing identity.
+    The symbol is defined on all of Euclidean space, with smoothness required
+    off the origin. Its value at zero does not affect the estimate. The
+    seminorm and Lebesgue norms take values in the extended nonnegative reals.
 
 review:
   status: self-assessed
   notes: >-
-    The statements in TwistedParaproduct/Auto/Theorems.lean were checked against
+    The earlier statements in TwistedParaproduct/Auto/Theorems.lean were checked against
     the manuscript by the author. The formalization of the proof itself has not
     been reviewed line by line by a human. comparator.json checks that the
     Challenge.lean statements match the proved Solution statements and use only
@@ -143,11 +123,7 @@ review:
 alignment:
   namespace: Auto
   statements:
-    - source: Blueprint Theorem bp:main (Fourier estimate)
-      lean: Auto.main_result_fourier
-      module: TwistedParaproduct.Auto.Theorems
-      status: proved
-    - source: Blueprint Theorem bp:main (principal value and kernel estimate)
+    - source: Blueprint Theorem bp:main
       lean: Auto.main_result
       module: TwistedParaproduct.Auto.Theorems
       status: proved

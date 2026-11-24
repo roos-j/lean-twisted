@@ -10,9 +10,7 @@ public import TwistedParaproduct.Auto.Theorems
 /-!
 # Solution file for Comparator
 
-The main results `Auto.main_result_fourier` and `Auto.main_result` are proved in
-`TwistedParaproduct/Auto/Theorems.lean`, from `Auto.fullMultiplier` and
-`Auto.hardHomogeneous` in
-`TwistedParaproduct/Auto/Sec5FromCoordinateMartingalesToFourierMultipliers.lean`.
-The definitions they use are in `TwistedParaproduct/Auto/Defs.lean`.
+The estimate `Auto.main_result` is proved in `TwistedParaproduct/Auto/Theorems.lean`
+using `Auto.fullMultiplier`. The twisted operator and the Mihlin–Hörmander
+seminorm are defined in `TwistedParaproduct/Auto/Defs.lean`.
 -/

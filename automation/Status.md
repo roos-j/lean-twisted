@@ -1,5 +1,5 @@
 complete | 2026-11-22 14:36:59 ET | tp_blueprint.tex:56 | Define the twisted Fourier operator
-complete | 2026-11-22 21:14:41 ET | tp_blueprint.tex:70 | Fourier Banach target, pointwise principal-value identification and norm bound; checked and axiom-audited
+complete | 2026-11-23 21:33:44 ET | bp:main | Twisted Fourier estimate in terms of the coordinate Mihlin–Hörmander seminorm
 complete | 2026-11-22 14:36:59 ET | tp_blueprint.tex:115-127 | Fourier integrability, continuity and invariance under changes at zero
 complete | 2026-11-22 14:36:59 ET | tp_blueprint.tex:128-144 | Coordinate and Frechet derivative bounds
 complete | 2026-11-22 14:36:59 ET | tp_blueprint.tex:174-180 | Child average and local Haar square identities on the line
@@ -44,4 +44,4 @@ complete | 2026-11-22 21:14:41 ET | tp_blueprint.tex:1348 | Uniform L1 compariso
 complete | 2026-11-22 21:14:41 ET | tp_blueprint.tex:1374 | Uniform hard annuli estimate on Schwartz inputs; checked and axiom-audited
 complete | 2026-11-22 21:14:41 ET | tp_blueprint.tex:1403 | Homogeneous multiplier and its spherically normalized tempered distribution; checked and axiom-audited
 complete | 2026-11-22 21:14:41 ET | tp_blueprint.tex:1451 | Pointwise and Lp convergence of hard annuli to the multiplier; checked and axiom-audited
-complete | 2026-11-22 21:14:41 ET | tp_blueprint.tex:1522-1558 | Fourier appendix proved by Auto.proveBanachTarget; checked and axiom-audited
+complete | 2026-11-23 21:33:44 ET | bp:lean-target | Lean example for the Fourier estimate
