@@ -1,6 +1,6 @@
 # Boundedness of higher-dimensional twisted paraproducts
 
-This is a formalization of the Lebesgue space bounds for higher-dimensional twisted paraproducts in the full open Banach range. This used to be an open problem until now. The proof and the formalization blueprint were generated with GPT-6.2 Astra Ultra. The formalization was done with GPT-6.2 Sol Light.
+This is a formalization of Lebesgue space bounds for higher-dimensional twisted paraproducts in the full open Banach range. This used to be an open problem until now. The proof and the formalization blueprint were generated with GPT-6.2 Astra Ultra. The formalization was done with GPT-6.2 Sol Light.
 
 ## Main theorem
 
