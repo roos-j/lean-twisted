@@ -1,6 +1,6 @@
 # Boundedness of higher-dimensional twisted paraproducts
 
-This is a formalization of Lebesgue space bounds for higher-dimensional twisted paraproducts in the full open Banach range. This used to be an open problem until now. The proof and the formalization blueprint were generated with GPT-6.2 Astra Ultra. The formalization was done with GPT-6.2 Sol Light.
+This is a formalization of Lebesgue space bounds for higher-dimensional twisted paraproducts in the full open Banach range. This was an open problem; see [Prior results](#prior-results) below. The proof and the formalization blueprint were generated with GPT-6.2 Astra Ultra. The formalization was done with GPT-6.2 Sol Light.
 
 ## Main theorem
 
@@ -29,3 +29,21 @@ with $`[m]_s\lt \infty`$ and any Schwartz functions $`f_1,\ldots,f_d:\mathbb{R}^
 \lVert T_m(f_1,\ldots,f_d)\rVert_{L^p(\mathbb{R}^d)}
     \le C \, [m]_s\prod_{i=1}^d\lVert f_i\rVert_{L^{p_i}(\mathbb{R}^d)} .
 ```
+
+## Prior results
+
+Boundedness of $`T_m`$ in the full open Banach range
+$`1\lt p,p_1,\ldots,p_d\lt\infty`$ was open for every $`d\ge 2`$:
+
+- **$`d=2`$.** Kovač [Kov12, Theorem 1] proved the bound for $`1\lt p_1,p_2\lt\infty`$ with  $`1/p_1+1/p_2\gt 1/2`$, that is, for target exponents $`p\lt 2`$ (this range also includes
+  quasi-Banach exponents $`p\le 1`$). The remaining part $`p\ge 2`$ of the Banach range is not covered: [Kov12, §1] does not treat it, and
+  [DR21, §1] refers to extending the range of exponents for the twisted paraproduct as an open question.
+- **$`d=3`$.** Durcik and Roos [DR21, §1 and §3] proved the bound for $`1\lt p\lt 4/3`$ and  $`1\lt p_1,p_2,p_3\lt 4`$ (stated there in dual form).
+- **$`d\ge 4`$.** No bounds were known for any exponents, see [DR21, §1].
+
+The theorem above covers the full open Banach range in every dimension $`d\ge 2`$.
+
+### References
+
+- [DR21] P. Durcik, J. Roos, *Averages of simplex Hilbert transforms*, Proc. Amer. Math. Soc. 149 (2021), no. 2, 633–647.
+- [Kov12] V. Kovač, *Boundedness of the twisted paraproduct*, Rev. Mat. Iberoam. 28 (2012), no. 4, 1143–1164.
