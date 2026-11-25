@@ -5,7 +5,7 @@ version: "v0.4"
 project:
   name: Boundedness of higher-dimensional twisted paraproducts
   description: >-
-    This is a formalization of Lebesgue space bounds for higher-dimensional twisted paraproducts in the full open Banach range. This was an open problem for every dimension d >= 2. For d = 2, Kovac (Rev. Mat. Iberoam. 2012, Theorem 1) proved bounds for target exponents p < 2 (1/p_1 + 1/p_2 > 1/2). For d = 3, Durcik and Roos (Proc. AMS 2021, Sections 1 and 3) proved bounds for 1 < p < 4/3 and 1 < p_i < 4. For d >= 4, no bounds were known for any exponents, as stated in Durcik-Roos (2021, Section 1). The proof and the formalization blueprint were generated with GPT-6.2 Astra Ultra. The formalization was done with GPT-6.2 Sol Light.
+    This is a formalization of Lebesgue space bounds for higher-dimensional twisted paraproducts in the full open Banach range. This was an open problem in every dimension d >= 2. For d = 2, Kovac (Rev. Mat. Iberoam. 2012, Theorem 1) proved bounds for input exponents 1 < p_1, p_2 < infinity with 1/p_1 + 1/p_2 > 1/2, i.e. target exponents p < 2. For d = 3, Durcik and Roos (Proc. AMS 2021, Sections 1 and 3) proved bounds for 1 < p < 4/3 and 1 < p_i < 4. For d >= 4, no bounds were known for any exponents, as stated in Durcik-Roos (2021, Section 1). The proof and the formalization blueprint were generated with GPT-6.2 Astra Ultra. The formalization was done with GPT-6.2 Sol Light.
   authors:
     - Polona Durcik
     - Joris Roos
